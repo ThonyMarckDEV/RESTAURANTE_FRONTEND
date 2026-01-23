@@ -5,7 +5,7 @@ import { handleResponse } from 'utilities/Responses/handleResponse';
 
 const login = async (username, password, rememberMe) => {
   const response = await axios.post(
-    `${API_BASE_URL}/api/login`,
+    `${API_BASE_URL}/api/auth/login`,
     { username, password, remember_me: rememberMe },
     {
       headers: {
@@ -18,7 +18,7 @@ const login = async (username, password, rememberMe) => {
 
 const forgotPassword = async (dni) => {
   const response = await axios.post(
-    `${API_BASE_URL}/api/forgot-password`,
+    `${API_BASE_URL}/api/auth/forgot-password`,
     { dni },
     {
       headers: {
@@ -35,7 +35,7 @@ const forgotPassword = async (dni) => {
  */
 const verifySession = async () => {
   // fetchWithAuth se encarga de poner el Header: Authorization Bearer ...
-  const response = await fetchWithAuth(`${API_BASE_URL}/api/me`, {
+  const response = await fetchWithAuth(`${API_BASE_URL}/api/auth/me`, {
     method: 'GET',
     headers: {
       'Accept': 'application/json'

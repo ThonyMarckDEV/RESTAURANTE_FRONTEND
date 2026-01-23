@@ -10,7 +10,7 @@ import { FaCashRegister, FaMoneyBill } from 'react-icons/fa';
 const menus = {
     superadmin: [
         { section: 'Home', icon: Home, link: '/superadmin' },
-        { section: 'Sedes', icon: Building, subs: [{ name: 'Agregar Sede', link: '/admin/agregar-sede' }, { name: 'Listar Sedes', link: '/admin/listar-sedes' }] },
+        { section: 'Sedes', icon: Building, subs: [{ name: 'Agregar Sede', link: '/superadmin/agregar-sede' }, { name: 'Listar Sedes', link: '/superadmin/listar-sedes' }] },
         { section: 'Categorías', icon: ListBulletIcon, subs: [{ name: 'Agregar Categoría', link: '/superadmin/agregar-categoria' }, { name: 'Listar Categorías', link: '/admin/listar-categorias' }] },
         { section: 'Proveedores', icon: UserIcon, subs: [{ name: 'Agregar Proveedor', link: '/superadmin/agregar-proveedor' }, { name: 'Listar Proveedores', link: '/admin/listar-proveedores' }] },
         { section: 'Productos', icon: DocumentTextIcon, subs: [{ name: 'Agregar Producto', link: '/superadmin/agregar-producto' }, { name: 'Listar Productos', link: '/admin/listar-productos' }] },

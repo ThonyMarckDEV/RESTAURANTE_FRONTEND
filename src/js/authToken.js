@@ -23,7 +23,7 @@ async function verificarYRenovarToken() {
 
   try {
     // Única llamada al backend para validar y/o refrescar
-    const response = await axios.post(`${API_BASE_URL}/api/validate-tokens`, {
+    const response = await axios.post(`${API_BASE_URL}/api/auth/validate-tokens`, {
       access_token,
       refresh_token
     });
@@ -81,7 +81,7 @@ function logout() {
   
   // Intenta notificar al backend sobre el logout si hay un refresh token
   if (refresh_token) {
-    axios.post(`${API_BASE_URL}/api/logout`, { refresh_token })
+    axios.post(`${API_BASE_URL}/api/auth/logout`, { refresh_token })
       .catch(err => {
         console.warn('Error al notificar logout al backend:', err.message);
       });

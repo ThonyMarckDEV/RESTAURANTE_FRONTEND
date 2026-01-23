@@ -22,7 +22,9 @@ import Home from 'ui/home/Home';
 
 
 // UIS ADMIN
-
+import AgregarSede from 'ui/SuperAdministrador/sedes/agregarSede/AgregarSede';
+import ListarSedes from 'ui/SuperAdministrador/sedes/listarSedes/ListarSedes';
+import EditarSede from 'ui/SuperAdministrador/sedes/editarSede/EditarSede';
 
 // UIS USUARIO
 
@@ -53,6 +55,14 @@ function AppContent() {
       >
         {/* Ruta Home (cuando solo pones /superadmin) */}
         <Route index element={<Home />} />
+
+        {/* RUTAS SEDES */}
+          {/* Ruta Agregar Sede */}
+          <Route path="agregar-sede" element={<AgregarSede />} />
+          {/* Ruta Listar Sede */}
+          <Route path="listar-sedes" element={<ListarSedes />} />
+          {/* Ruta Editar Sede */}
+          <Route path="editar-sede/:id" element={<EditarSede />} />
 
 
       </Route>
