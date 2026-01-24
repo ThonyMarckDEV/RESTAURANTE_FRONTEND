@@ -22,9 +22,16 @@ import Home from 'ui/home/Home';
 
 
 // UIS ADMIN
-import AgregarSede from 'ui/SuperAdministrador/sedes/agregarSede/AgregarSede';
-import ListarSedes from 'ui/SuperAdministrador/sedes/listarSedes/ListarSedes';
-import EditarSede from 'ui/SuperAdministrador/sedes/editarSede/EditarSede';
+  // RUTAS SEDES
+  import AgregarSede from 'ui/SuperAdministrador/sedes/agregarSede/AgregarSede';
+  import ListarSedes from 'ui/SuperAdministrador/sedes/listarSedes/ListarSedes';
+  import EditarSede from 'ui/SuperAdministrador/sedes/editarSede/EditarSede';
+  //RUTAS CATEGORIAS
+  import AgregarCategoria from 'ui/SuperAdministrador/categorias/agregarCategoria/AgregarCategoria';
+  import ListarCategorias from 'ui/SuperAdministrador/categorias/listarCategorias/ListarCategorias';
+  import EditarCategoria from 'ui/SuperAdministrador/categorias/editarCategoria/EditarCategoria';
+
+
 
 // UIS USUARIO
 
@@ -63,6 +70,14 @@ function AppContent() {
           <Route path="listar-sedes" element={<ListarSedes />} />
           {/* Ruta Editar Sede */}
           <Route path="editar-sede/:id" element={<EditarSede />} />
+
+        {/* RUTAS CATEGORIAS */}
+          {/* Ruta Agregar Categoria */}
+          <Route path="agregar-categoria" element={<AgregarCategoria />} />
+          {/* Ruta Listar Categoria */}
+          <Route path="listar-categorias" element={<ListarCategorias />} />
+          {/* Ruta Editar Categoria */}
+          <Route path="editar-categoria/:id" element={<EditarCategoria />} />
 
 
       </Route>

@@ -12,10 +12,24 @@ export const createSede = async (data) => {
   return handleResponse(response);
 };
 
-export const getSedes = async (page = 1, search = '') => {
-  const term = encodeURIComponent(search);
-  const url = `${API_BASE_URL}/api/sedes?page=${page}&search=${term}`;
-  const response = await fetchWithAuth(url, { method: 'GET', headers: { 'Accept': 'application/json' } });
+export const getSedes = async (pageNumber = 1, search = '') => {
+  const params = new URLSearchParams({
+    page: pageNumber - 1,
+    size: 10,
+  });
+
+  // Solo agregamos el search si realmente tiene contenido
+  if (search.trim()) {
+    params.append('search', search);
+  }
+
+  const url = `${API_BASE_URL}/api/sedes?${params.toString()}`;
+
+  const response = await fetchWithAuth(url, { 
+    method: 'GET', 
+    headers: { 'Accept': 'application/json' } 
+  });
+
   return handleResponse(response);
 };
 

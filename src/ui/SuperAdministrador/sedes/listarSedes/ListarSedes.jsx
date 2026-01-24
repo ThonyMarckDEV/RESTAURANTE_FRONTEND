@@ -13,7 +13,7 @@ const ListarSedes = () => {
     const [sedeToToggle, setSedeToToggle] = useState(null);
     const [sedes, setSedes] = useState([]);
     
-    const [paginationInfo, setPaginationInfo] = useState({ currentPage: 1, totalPages: 1, totalItems: 0 });
+    const [paginationInfo, setPaginationInfo] = useState({ currentPage: 1, totalPages: 1 });
     const [searchTerm, setSearchTerm] = useState('');
 
     const columns = useMemo(() => [
@@ -21,7 +21,6 @@ const ListarSedes = () => {
             header: 'Nombre',
             render: (row) => (
                 <div className="flex items-center gap-3">
-                    {/* Icono con fondo 'surface' y color 'primary' */}
                     <div className="p-2 text-restaurant-primary rounded-lg shadow-sm border border-restaurant-secondary/30">
                         <BuildingStorefrontIcon className="w-5 h-5"/>
                     </div>
@@ -51,7 +50,7 @@ const ListarSedes = () => {
                         row.estado === 1
                             ? 'text-emerald-700 bg-emerald-100 border-emerald-200 hover:bg-red-100 hover:text-red-700 hover:border-red-200'
                             : 'text-red-700 bg-red-50 border-red-100 hover:bg-emerald-100 hover:text-emerald-700 hover:border-emerald-200'
-                    } ${row.id === 1 ? 'opacity-60 cursor-not-allowed hover:bg-emerald-100 hover:text-emerald-700' : ''}`}
+                    } ${row.id === 1 ? 'opacity-60 cursor-not-allowed' : ''}`}
                     title={row.id === 1 ? "La sede principal no se puede desactivar" : "Clic para cambiar estado"}
                 >
                     {row.estado === 1 ? 'OPERATIVA' : 'CERRADA'}
@@ -72,16 +71,15 @@ const ListarSedes = () => {
         }
     ], []);
 
+    // --- FETCH DATA ---
     const fetchSedes = useCallback(async (page, search = '') => {
         setLoading(true);
         try {
             const response = await getSedes(page, search);
-            setSedes(response.data || []);
-            setPaginationInfo({
-                currentPage: response.current_page,
-                totalPages: response.last_page,
-                totalItems: response.total,
-            });
+            const { content, currentPage, totalPages } = response.data;
+            
+            setSedes(content);
+            setPaginationInfo({ currentPage, totalPages });
         } catch (err) {
             setAlert({ type: 'error', message: 'Error al cargar las sedes.' });
         } finally {
@@ -89,29 +87,33 @@ const ListarSedes = () => {
         }
     }, []);
 
-    useEffect(() => { 
-        fetchSedes(1, searchTerm); 
-    }, [fetchSedes, searchTerm]);
+    // --- EFECTO BÚSQUEDA CON DEBOUNCE ---
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            fetchSedes(1, searchTerm);
+        }, 500); // Espera 500ms antes de llamar a la API
 
+        return () => clearTimeout(handler);
+    }, [searchTerm, fetchSedes]);
+
+    // --- CAMBIAR ESTADO ---
     const executeToggleEstado = async () => {
         if (!sedeToToggle) return;
         
-        if(sedeToToggle.esPrincipal) {
-            setAlert({ type: 'warning', message: 'No se puede desactivar la Sede Principal.' });
-            setSedeToToggle(null);
-            return;
-        }
-
-        const nuevoEstado = sedeToToggle.estado === 1 ? 0 : 1;
+        const { id, estado } = sedeToToggle;
         setSedeToToggle(null);
         setLoading(true);
         
         try {
-            const response = await toggleSedeEstado(sedeToToggle.id, nuevoEstado);
-            setAlert(response);
+            const nuevoEstado = estado === 1 ? 0 : 1;
+            const response = await toggleSedeEstado(id, nuevoEstado);
+            setAlert({ type: 'success', message: response.message });
+            // Recargar página actual
             await fetchSedes(paginationInfo.currentPage, searchTerm);
         } catch (err) {
-            setAlert(err);
+            // Manejar error de validación de Spring
+            const errorMsg = err.response?.data?.message || 'Error al cambiar estado';
+            setAlert({ type: 'error', message: errorMsg });
             setLoading(false);
         }
     };
@@ -137,17 +139,21 @@ const ListarSedes = () => {
                 </Link>
             </div>
 
-            <AlertMessage type={alert?.type} message={alert?.message} onClose={() => setAlert(null)} />
+            <AlertMessage 
+                type={alert?.type} 
+                message={alert?.message} 
+                onClose={() => setAlert(null)} 
+            />
 
             {sedeToToggle && (
                 <ConfirmModal
-                    message={`¿Estás seguro de cambiar el estado a ${sedeToToggle.estado === 1 ? 'CERRADA' : 'OPERATIVA'}? Esto afectará el acceso del personal.`}
+                    message={`¿Estás seguro de cambiar el estado de la sede? Esto afectará el acceso del personal.`}
                     onConfirm={executeToggleEstado}
                     onCancel={() => setSedeToToggle(null)}
                 />
             )}
             
-            <div className="overflow-hidden">
+            <div className="overflow-hidden rounded-xl">
                 <Table 
                     columns={columns}
                     data={sedes}

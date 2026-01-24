@@ -2,10 +2,6 @@ import React from 'react';
 
 const DOTS = '...';
 
-/**
- * Función de utilidad para generar el rango de paginación.
- * No es un Hook, por eso no empieza con "use".
- */
 const getPaginationRange = ({ totalPages, currentPage, siblingCount = 1 }) => {
   const range = (start, end) => {
     let length = end - start + 1;
@@ -44,57 +40,66 @@ const getPaginationRange = ({ totalPages, currentPage, siblingCount = 1 }) => {
     return [firstPageIndex, DOTS, ...middleRange, DOTS, lastPageIndex];
   }
 
-  // Se añade un return por defecto para todos los casos posibles
   return range(1, totalPages);
 };
 
-
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
-  // Ahora la llamada a la función está antes del "if", pero ya no es un Hook
-  // por lo que no hay problema. La lógica sigue siendo la misma.
   const paginationRange = getPaginationRange({ currentPage, totalPages });
 
-  if (totalPages <= 1) {
-    return null;
-  }
+  // Si no hay páginas o solo hay una, no renderizamos nada
+  if (totalPages <= 1) return null;
+
+  const handlePrevious = () => {
+    if (currentPage > 1) onPageChange(currentPage - 1);
+  };
+
+  const handleNext = () => {
+    if (currentPage < totalPages) onPageChange(currentPage + 1);
+  };
 
   return (
-    <nav className="flex justify-center items-center space-x-2 mt-8">
+    <nav className="flex justify-center items-center space-x-1 mt-8 select-none">
+      {/* Botón Anterior */}
       <button
-          onClick={() => onPageChange(currentPage - 1)}
-          // Si currentPage es 1, se deshabilita
-          disabled={currentPage === 1} 
-          className="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+        onClick={handlePrevious}
+        disabled={currentPage === 1}
+        className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-l-md hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
       >
-          Anterior
+        Anterior
       </button>
 
+      {/* Números de Página */}
       {paginationRange.map((pageNumber, index) => {
         if (pageNumber === DOTS) {
-          return <span key={`${pageNumber}-${index}`} className="px-4 py-2 text-sm font-medium text-gray-700">...</span>;
+          return (
+            <span key={`dots-${index}`} className="px-3 py-2 text-gray-500">
+              &#8230;
+            </span>
+          );
         }
+
         return (
           <button
             key={pageNumber}
             onClick={() => onPageChange(pageNumber)}
-            className={`px-4 py-2 text-sm font-medium border rounded-md ${
+            className={`px-4 py-2 text-sm font-semibold border transition-all ${
               currentPage === pageNumber
-                ? 'bg-red-700 text-white border-red-700'
-                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                ? 'bg-red-700 text-white border-red-700 z-10 shadow-sm'
+                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
             }`}
           >
             {pageNumber}
-          </button> 
+          </button>
         );
       })}
 
+      {/* Botón Siguiente */}
       <button
-          onClick={() => onPageChange(currentPage + 1)}
-          // Si currentPage es igual a totalPages, se deshabilita
-          disabled={currentPage === totalPages}
-          className="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+        onClick={handleNext}
+        disabled={currentPage === totalPages}
+        className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-r-md hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
       >
-          Siguiente
+        Siguiente
       </button>
     </nav>
   );
