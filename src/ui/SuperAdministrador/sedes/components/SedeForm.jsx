@@ -1,58 +1,53 @@
 import React from 'react';
+import { BuildingOffice2Icon } from '@heroicons/react/24/outline';
 
-const SedeForm = ({ data, handleChange }) => {
-  const baseInputClass = "w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all";
+const SedeForm = ({ formData = {}, onChange }) => {
+    
+    const inputClass = "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-1 focus:ring-restaurant-secondary focus:border-restaurant-secondary outline-none text-sm transition-all";
+    const labelClass = "block text-xs font-bold text-gray-600 mb-1";
 
-  return (
-    <div>
-      <h2 className="text-xl font-semibold text-slate-700 mb-6 border-b pb-2">Información de la Sede</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
-        
-        <div className="col-span-1 md:col-span-2">
-          <label htmlFor="nombre" className="block text-sm font-medium text-slate-600 mb-1">Nombre de la Sede</label>
-          <input 
-            id="nombre" 
-            name="nombre" 
-            type="text" 
-            value={data.nombre} 
-            onChange={handleChange} 
-            placeholder="Ej. Sucursal Centro" 
-            className={baseInputClass} 
-            required
-          />
+    return (
+        <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-restaurant-secondary h-fit">
+            <div className="flex items-center gap-3 mb-6 border-b border-gray-100 pb-3">
+                <div className="p-2 bg-restaurant-surface rounded-full">
+                    <BuildingOffice2Icon className="w-6 h-6 text-restaurant-primary" />
+                </div>
+                <h2 className="text-lg font-bold text-gray-800">1. Datos del Local</h2>
+            </div>
+
+            <div className="space-y-5">
+                <div>
+                    <label className={labelClass}>Nombre de Sede</label>
+                    <input 
+                        name="nombre" 
+                        value={formData?.nombre || ''} 
+                        onChange={onChange} 
+                        className={inputClass} 
+                        required 
+                    />
+                </div>
+                <div>
+                    <label className={labelClass}>Dirección</label>
+                    <input 
+                        name="direccion" 
+                        value={formData?.direccion || ''} 
+                        onChange={onChange} 
+                        className={inputClass} 
+                    />
+                </div>
+                <div>
+                    <label className={labelClass}>Código SUNAT</label>
+                    <input 
+                        name="codigo_sunat" 
+                        value={formData?.codigo_sunat || ''} 
+                        onChange={onChange} 
+                        className={inputClass} 
+                        maxLength={4} 
+                    />
+                </div>
+            </div>
         </div>
-
-        <div>
-          <label htmlFor="codigo_sunat" className="block text-sm font-medium text-slate-600 mb-1">Código SUNAT (Opcional)</label>
-          <input 
-            id="codigo_sunat" 
-            name="codigo_sunat" 
-            type="text" 
-            value={data.codigo_sunat} 
-            onChange={handleChange} 
-            placeholder="Ej. 0001" 
-            className={baseInputClass} 
-            maxLength="4"
-          />
-          <p className="text-xs text-gray-400 mt-1">Usado para facturación electrónica.</p>
-        </div>
-
-        <div className="col-span-1 md:col-span-2">
-          <label htmlFor="direccion" className="block text-sm font-medium text-slate-600 mb-1">Dirección Física</label>
-          <input 
-            id="direccion" 
-            name="direccion" 
-            type="text" 
-            value={data.direccion} 
-            onChange={handleChange} 
-            placeholder="Ej. Av. Principal 123" 
-            className={baseInputClass} 
-          />
-        </div>
-
-      </div>
-    </div>
-  );
+    );
 };
 
 export default SedeForm;

@@ -67,10 +67,25 @@ const Sidebar = () => {
     };
 
     const isSectionActive = useCallback((item) => {
-        if (item.link && location.pathname.startsWith(item.link)) return true;
-        if (item.subs) return item.subs.some(sub => location.pathname.startsWith(sub.link));
+        const currentPath = location.pathname;
+
+        // 1. Si es el HOME (comparación exacta para evitar que coincida con todo)
+        if (item.section === 'Home') {
+            return currentPath === item.link;
+        }
+
+        // 2. Si tiene submenús, verificamos si la ruta actual empieza con alguno de los links de los subs
+        if (item.subs) {
+            return item.subs.some(sub => currentPath.startsWith(sub.link));
+        }
+
+        // 3. Para items simples (como Configuración)
+        if (item.link) {
+            return currentPath.startsWith(item.link);
+        }
+
         return false;
-    }, [location.pathname]); 
+    }, [location.pathname]);
     
     useEffect(() => {
         if (openSection === null) {
