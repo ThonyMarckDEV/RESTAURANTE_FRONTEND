@@ -15,6 +15,17 @@ const ListarCategorias = () => {
     const [paginationInfo, setPaginationInfo] = useState({ currentPage: 1, totalPages: 1 });
     const [searchTerm, setSearchTerm] = useState('');
 
+    // Helper para formatear el tipo
+    const getTipoLabel = (tipo) => {
+        switch(tipo) {
+            case 1: return <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs font-bold">INSUMO</span>;
+            case 2: return <span className="bg-purple-100 text-purple-700 px-2 py-0.5 rounded text-xs font-bold">PRODUCTO</span>;
+            case 3: return <span className="bg-orange-100 text-orange-700 px-2 py-0.5 rounded text-xs font-bold">PLATO</span>;
+            case 4: return <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs font-bold">MIXTO</span>;
+            default: return <span className="text-gray-500 text-xs">Desconocido</span>;
+        }
+    };
+
     const columns = useMemo(() => [
         {
             header: 'Categoría',
@@ -26,6 +37,10 @@ const ListarCategorias = () => {
                     <span className="font-bold text-gray-800">{row.nombre}</span>
                 </div>
             )
+        },
+        {
+            header: 'Tipo',
+            render: (row) => getTipoLabel(row.tipo_categoria)
         },
         {
             header: 'Estado',
@@ -89,7 +104,7 @@ const ListarCategorias = () => {
     return (
         <div className="container mx-auto p-6 min-h-screen">
             <div className="flex justify-between items-center mb-8">
-                <h1 className="text-3xl font-serif font-bold text-restaurant-primary">Categorías de Productos</h1>
+                <h1 className="text-3xl font-serif font-bold text-restaurant-primary">Categorías</h1>
                 <Link to="/superadmin/agregar-categoria" className="bg-restaurant-primary text-white px-5 py-2.5 rounded-lg font-bold flex items-center gap-2">
                     <TagIcon className="w-5 h-5"/> Nueva Categoría
                 </Link>

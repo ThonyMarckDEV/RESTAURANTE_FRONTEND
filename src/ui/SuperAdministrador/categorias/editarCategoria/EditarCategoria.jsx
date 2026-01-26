@@ -8,7 +8,7 @@ import CategoriaForm from '../components/CategoriaForm';
 const EditarCategoria = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ nombre: '', estado: 1 });
+  const [formData, setFormData] = useState({ nombre: '', tipoCategoria: 4, estado: 1 });
   const [loading, setLoading] = useState(true);
   const [alert, setAlert] = useState(null);
 
@@ -18,6 +18,8 @@ const EditarCategoria = () => {
         const response = await showCategoria(id);
         setFormData({
           nombre: response.data.nombre,
+          // Mapeamos snake_case del backend a camelCase del form
+          tipoCategoria: response.data.tipo_categoria, 
           estado: response.data.estado
         });
       } catch (err) {
@@ -37,10 +39,16 @@ const EditarCategoria = () => {
       setAlert({ type: 'success', message: 'Categoría actualizada.' });
       setTimeout(() => navigate('/superadmin/listar-categorias'), 1500);
     } catch (err) {
-      setAlert({ type: 'error', message: err.message });
+      const details = err.details ? Object.values(err.details).flat() : [];
+      setAlert({ type: 'error', message: err.message || 'Error al actualizar', details });
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleChange = (e) => {
+      const { name, value } = e.target;
+      setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   if (loading && !formData.nombre) return <LoadingScreen />;
@@ -51,9 +59,9 @@ const EditarCategoria = () => {
           <h1 className="text-3xl font-serif font-bold text-restaurant-primary">Editar Categoría</h1>
           <button onClick={() => navigate('/superadmin/listar-categorias')} className="text-restaurant-secondary font-bold">← Volver</button>
       </div>
-      <AlertMessage type={alert?.type} message={alert?.message} onClose={() => setAlert(null)} />
+      <AlertMessage type={alert?.type} message={alert?.message} details={alert?.details} onClose={() => setAlert(null)} />
       <form onSubmit={handleSubmit}>
-          <CategoriaForm formData={formData} onChange={(e) => setFormData({...formData, [e.target.name]: e.target.value})} />
+          <CategoriaForm formData={formData} onChange={handleChange} />
           <div className="flex justify-center mt-8">
             <button disabled={loading} className="px-10 py-3 text-white bg-restaurant-primary rounded-lg font-bold shadow-lg">
                 {loading ? 'Guardando...' : 'GUARDAR CAMBIOS'}

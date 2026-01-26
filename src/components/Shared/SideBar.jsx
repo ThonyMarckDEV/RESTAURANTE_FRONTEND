@@ -4,7 +4,7 @@ import { Bars3Icon, ChevronDownIcon, ClipboardDocumentCheckIcon, DocumentTextIco
 import jwtUtils from 'utilities/Token/jwtUtils';
 import { logout } from 'js/logout';
 import ConfirmModal from 'components/Shared/Modals/ConfirmModal';
-import { Building, ChartBarIcon, Home, Settings, ShoppingBasket, ShoppingCartIcon, UserCircle2Icon, UserIcon } from 'lucide-react';
+import { BeefIcon, Box, Building, ChartBarIcon, Home, Settings, ShoppingBasket, ShoppingCartIcon, UserCircle2Icon, UserIcon } from 'lucide-react';
 import { FaCashRegister, FaMoneyBill } from 'react-icons/fa';
 
 const menus = {
@@ -23,6 +23,8 @@ const menus = {
     ],
     admin: [
         { section: 'Home', icon: Home, link: '/admin' },
+        { section: 'Almacenes', icon: Box, subs: [{ name: 'Agregar Almacen', link: '/admin/agregar-almacen' }, { name: 'Listar Almacenes', link: '/admin/listar-almacenes' }] },
+        { section: 'Insumos', icon: BeefIcon, subs: [{ name: 'Agregar Insumo', link: '/admin/agregar-insumo' }, { name: 'Listar Insumos', link: '/admin/listar-insumos' }] },
         { section: 'Cajeros', icon: UserCircle2Icon, subs: [{ name: 'Agregar Cajero', link: '/admin/agregar-cajero' }, { name: 'Listar Cajeros', link: '/admin/listar-cajeros' }] },
         { section: 'Cajas', icon: FaMoneyBill, subs: [{ name: 'Agregar Caja', link: '/admin/agregar-caja' }, { name: 'Listar Cajas', link: '/admin/listar-cajas' }] },
         { section: 'Sesiones Caja', icon: FaCashRegister, subs: [{ name: 'Listar Sesiones Caja', link: '/admin/listar-sesiones-caja' }] },

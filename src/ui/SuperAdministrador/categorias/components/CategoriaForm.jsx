@@ -1,5 +1,5 @@
 import React from 'react';
-import { TagIcon } from '@heroicons/react/24/outline';
+import { TagIcon, SwatchIcon } from '@heroicons/react/24/outline';
 
 const CategoriaForm = ({ formData, onChange }) => {
   const inputClass = "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-1 focus:ring-restaurant-secondary focus:border-restaurant-secondary outline-none text-sm transition-all";
@@ -7,6 +7,7 @@ const CategoriaForm = ({ formData, onChange }) => {
 
   const handleLetterChange = (e) => {
     const { value } = e.target;
+    // Permite letras y espacios
     if (value === '' || /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/.test(value)) {
       onChange(e);
     }
@@ -22,6 +23,7 @@ const CategoriaForm = ({ formData, onChange }) => {
       </div>
 
       <div className="space-y-4">
+        {/* Nombre */}
         <div>
           <label className={labelClass}>Nombre de la Categoría</label>
           <input 
@@ -29,11 +31,35 @@ const CategoriaForm = ({ formData, onChange }) => {
             value={formData.nombre} 
             onChange={handleLetterChange} 
             className={inputClass} 
-            placeholder="Ej: Bebidas, Entradas, Platos de Fondo"
+            placeholder="Ej: Bebidas, Entradas, Carnes"
             required 
           />
         </div>
 
+        {/* Tipo de Categoría (NUEVO) */}
+        <div>
+            <label className={labelClass}>Tipo de Ítem</label>
+            <div className="relative">
+                <SwatchIcon className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                <select 
+                    name="tipoCategoria" 
+                    value={formData.tipoCategoria} 
+                    onChange={onChange} 
+                    className={`${inputClass} pl-10`}
+                    required
+                >
+                    <option value={1}>Insumo (Solo Almacén)</option>
+                    <option value={2}>Producto (Solo Venta)</option>
+                    <option value={3}>Plato (Solo Cocina)</option>
+                    <option value={4}>Mixto (General)</option>
+                </select>
+            </div>
+            <p className="text-[10px] text-gray-400 mt-1 ml-1">
+                Define dónde aparecerá esta categoría en el sistema.
+            </p>
+        </div>
+
+        {/* Estado */}
         <div>
             <label className={labelClass}>Estado Inicial</label>
             <select name="estado" value={formData.estado} onChange={onChange} className={inputClass}>

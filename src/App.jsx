@@ -21,7 +21,7 @@ import Login from 'ui/auth/Login/Login';
 import Home from 'ui/home/Home';
 
 
-// UIS ADMIN
+// UIS SUPERADMIN
   // RUTAS SEDES
   import AgregarSede from 'ui/SuperAdministrador/sedes/agregarSede/AgregarSede';
   import ListarSedes from 'ui/SuperAdministrador/sedes/listarSedes/ListarSedes';
@@ -35,8 +35,15 @@ import Home from 'ui/home/Home';
   import ListarProveedores from 'ui/SuperAdministrador/proveedores/listarProveedor/ListarProveedores';
   import EditarProveedor from 'ui/SuperAdministrador/proveedores/editarProveedor/EditarProveedor';
 
-
-// UIS USUARIO
+// UIS ADMIN
+  //RUTAS ALMACEN
+  import AgregarAlmacen from 'ui/Administrador/almacenes/agregarAlmacen/AgregarAlmacen';
+  import ListarAlmacenes from 'ui/Administrador/almacenes/listarAlmacenes/ListarAlmacenes';
+  import EditarAlmacen from 'ui/Administrador/almacenes/editarAlmacen/EditarAlmacen';
+  //RUTAS INSUMOS
+  import AgregarInsumo from 'ui/Administrador/insumos/agregarInsumo/AgregarInsumo';
+  import ListarInsumos from 'ui/Administrador/insumos/listarInsumos/ListarInsumos';
+  import EditarInsumo  from 'ui/Administrador/insumos/editarInsumo/EditarInsumo';
 
 
 // Utilities
@@ -107,8 +114,21 @@ function AppContent() {
         {/* Ruta Home (cuando solo pones /admin) */}
         <Route index element={<Home />} />
 
-        {/* Ruta Listar Roles */}
-        {/* <Route path="listar-roles" element={<ListarRoles />} /> */}
+        {/* RUTAS ALMACEN */}
+          {/* Ruta Agregar Almacen */}
+          <Route path="agregar-almacen" element={<AgregarAlmacen />} />
+          {/* Ruta Listar Almacen */}
+          <Route path="listar-almacenes" element={<ListarAlmacenes />} />
+          {/* Ruta Editar Almacen */}
+          <Route path="editar-almacen/:id" element={<EditarAlmacen />} />
+
+        {/* RUTAS INSUMOS */}
+          {/* Ruta Agregar Insumo */}
+          <Route path="agregar-insumo" element={<AgregarInsumo />} />
+          {/* Ruta Listar Insumos */}
+          <Route path="listar-insumos" element={<ListarInsumos />} />
+          {/* Ruta Editar Insumo */}
+          <Route path="editar-insumo/:id" element={<EditarInsumo />} />
 
       </Route>
 
