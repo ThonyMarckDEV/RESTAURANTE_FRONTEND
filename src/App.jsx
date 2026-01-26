@@ -30,7 +30,10 @@ import Home from 'ui/home/Home';
   import AgregarCategoria from 'ui/SuperAdministrador/categorias/agregarCategoria/AgregarCategoria';
   import ListarCategorias from 'ui/SuperAdministrador/categorias/listarCategorias/ListarCategorias';
   import EditarCategoria from 'ui/SuperAdministrador/categorias/editarCategoria/EditarCategoria';
-
+  //RUTAS PROVEEDORES
+  import AgregarProveedor from 'ui/SuperAdministrador/proveedores/agregarProveedor/AgregarProveedor';
+  import ListarProveedores from 'ui/SuperAdministrador/proveedores/listarProveedor/ListarProveedores';
+  import EditarProveedor from 'ui/SuperAdministrador/proveedores/editarProveedor/EditarProveedor';
 
 
 // UIS USUARIO
@@ -78,6 +81,14 @@ function AppContent() {
           <Route path="listar-categorias" element={<ListarCategorias />} />
           {/* Ruta Editar Categoria */}
           <Route path="editar-categoria/:id" element={<EditarCategoria />} />
+
+        {/* RUTAS PROVEEDORES */}
+          {/* Ruta Agregar Proveedor */}
+          <Route path="agregar-proveedor" element={<AgregarProveedor />} />
+          {/* Ruta Listar Proveedor */}
+          <Route path="listar-proveedores" element={<ListarProveedores />} />
+          {/* Ruta Editar Proveedor */}
+          <Route path="editar-proveedor/:id" element={<EditarProveedor />} />
 
 
       </Route>

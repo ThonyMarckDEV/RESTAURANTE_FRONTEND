@@ -5,6 +5,13 @@ const CategoriaForm = ({ formData, onChange }) => {
   const inputClass = "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-1 focus:ring-restaurant-secondary focus:border-restaurant-secondary outline-none text-sm transition-all";
   const labelClass = "block text-xs font-bold text-gray-600 mb-1";
 
+  const handleLetterChange = (e) => {
+    const { value } = e.target;
+    if (value === '' || /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/.test(value)) {
+      onChange(e);
+    }
+  };
+
   return (
     <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-restaurant-primary h-fit max-w-lg mx-auto">
       <div className="flex items-center gap-3 mb-6 border-b border-gray-100 pb-3">
@@ -20,7 +27,7 @@ const CategoriaForm = ({ formData, onChange }) => {
           <input 
             name="nombre" 
             value={formData.nombre} 
-            onChange={onChange} 
+            onChange={handleLetterChange} 
             className={inputClass} 
             placeholder="Ej: Bebidas, Entradas, Platos de Fondo"
             required 

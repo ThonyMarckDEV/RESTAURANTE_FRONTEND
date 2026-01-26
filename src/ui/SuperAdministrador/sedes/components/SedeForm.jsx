@@ -6,6 +6,15 @@ const SedeForm = ({ formData = {}, onChange }) => {
     const inputClass = "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-1 focus:ring-restaurant-secondary focus:border-restaurant-secondary outline-none text-sm transition-all";
     const labelClass = "block text-xs font-bold text-gray-600 mb-1";
 
+    // Función para filtrar solo números y mantener el estado limpio
+    const handleNumberChange = (e) => {
+        const { value } = e.target;
+        // Permite solo dígitos para cumplir con el formato de SUNAT
+        if (value === '' || /^[0-9]*$/.test(value)) {
+            onChange(e);
+        }
+    };
+
     return (
         <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-restaurant-secondary h-fit">
             <div className="flex items-center gap-3 mb-6 border-b border-gray-100 pb-3">
@@ -23,6 +32,7 @@ const SedeForm = ({ formData = {}, onChange }) => {
                         value={formData?.nombre || ''} 
                         onChange={onChange} 
                         className={inputClass} 
+                        placeholder="Ej. Sede Central Sullana"
                         required 
                     />
                 </div>
@@ -33,16 +43,19 @@ const SedeForm = ({ formData = {}, onChange }) => {
                         value={formData?.direccion || ''} 
                         onChange={onChange} 
                         className={inputClass} 
+                        placeholder="Ej. Calle Transversal Tarapacá 456"
                     />
                 </div>
                 <div>
-                    <label className={labelClass}>Código SUNAT</label>
+                    <label className={labelClass}>Código SUNAT (Solo números)</label>
                     <input 
                         name="codigo_sunat" 
                         value={formData?.codigo_sunat || ''} 
-                        onChange={onChange} 
+                        onChange={handleNumberChange} 
                         className={inputClass} 
                         maxLength={4} 
+                        placeholder="Ej. 0001"
+                        inputMode="numeric" 
                     />
                 </div>
             </div>

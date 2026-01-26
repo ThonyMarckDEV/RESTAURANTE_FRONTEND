@@ -5,6 +5,23 @@ const AdminForm = ({ formData, onChange }) => {
   const inputClass = "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-1 focus:ring-restaurant-secondary focus:border-restaurant-secondary outline-none text-sm transition-all";
   const labelClass = "block text-xs font-bold text-gray-600 mb-1";
 
+  // Validación para permitir solo números (DNI, Teléfono)
+  const handleNumberChange = (e) => {
+    const { value } = e.target;
+    if (value === '' || /^[0-9]*$/.test(value)) {
+      onChange(e);
+    }
+  };
+
+  // Validación para permitir solo letras, espacios y tildes (Nombres, Apellidos)
+  const handleLetterChange = (e) => {
+    const { value } = e.target;
+    // Permite letras (A-Z, a-z), tildes, ñ y espacios
+    if (value === '' || /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/.test(value)) {
+      onChange(e);
+    }
+  };
+
   return (
     <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-restaurant-primary h-fit">
       <div className="flex items-center gap-3 mb-6 border-b border-gray-100 pb-3">
@@ -15,16 +32,16 @@ const AdminForm = ({ formData, onChange }) => {
       </div>
 
       <div className="space-y-4">
-        {/* FILA 1: DNI y FECHAS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className={labelClass}>DNI</label>
             <input 
               name="dni" 
               value={formData.dni} 
-              onChange={onChange} 
+              onChange={handleNumberChange} 
               className={inputClass} 
               maxLength={8} 
+              placeholder="Ej. 70654321"
               required 
             />
           </div>
@@ -48,31 +65,62 @@ const AdminForm = ({ formData, onChange }) => {
           </div>
         </div>
 
-        {/* FILA 2: NOMBRES COMPLETOS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className={labelClass}>Nombre</label>
-            <input name="nombre" value={formData.nombre} onChange={onChange} className={inputClass} required />
+            <input 
+              name="nombre" 
+              value={formData.nombre} 
+              onChange={handleLetterChange} 
+              className={inputClass} 
+              placeholder="Ej. Anthony Marck"
+              required 
+            />
           </div>
           <div>
             <label className={labelClass}>Apellido Paterno</label>
-            <input name="apellidoPaterno" value={formData.apellidoPaterno} onChange={onChange} className={inputClass} required />
+            <input 
+              name="apellidoPaterno" 
+              value={formData.apellidoPaterno} 
+              onChange={handleLetterChange} 
+              className={inputClass} 
+              placeholder="Ej. Mendoza"
+              required 
+            />
           </div>
           <div>
             <label className={labelClass}>Apellido Materno</label>
-            <input name="apellidoMaterno" value={formData.apellidoMaterno} onChange={onChange} className={inputClass} />
+            <input 
+              name="apellidoMaterno" 
+              value={formData.apellidoMaterno} 
+              onChange={handleLetterChange} 
+              className={inputClass} 
+              placeholder="Ej. Sánchez"
+            />
           </div>
         </div>
 
-        {/* FILA 3: CONTACTO Y ESTADO CIVIL */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="md:col-span-2">
                 <label className={labelClass}>Dirección</label>
-                <input name="direccion" value={formData.direccion} onChange={onChange} className={inputClass} />
+                <input 
+                  name="direccion" 
+                  value={formData.direccion} 
+                  onChange={onChange} 
+                  className={inputClass} 
+                  placeholder="Ej. Av. Grau 123 - Talara"
+                />
             </div>
             <div>
                 <label className={labelClass}>Teléfono</label>
-                <input name="telefono" value={formData.telefono} onChange={onChange} className={inputClass} maxLength={9}/>
+                <input 
+                  name="telefono" 
+                  value={formData.telefono} 
+                  onChange={handleNumberChange} 
+                  className={inputClass} 
+                  maxLength={9}
+                  placeholder="Ej. 987654321"
+                />
             </div>
         </div>
         
@@ -87,7 +135,6 @@ const AdminForm = ({ formData, onChange }) => {
             </select>
         </div>
 
-        {/* SECCIÓN CREDENCIALES */}
         <div className="pt-4 border-t border-dashed border-gray-200 mt-2">
           <p className="text-xs text-restaurant-secondary font-bold mb-3 uppercase tracking-widest">
             Credenciales de Acceso
@@ -95,17 +142,24 @@ const AdminForm = ({ formData, onChange }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className={labelClass}>Usuario</label>
-              <input name="username" value={formData.username} onChange={onChange} className={inputClass} required />
+              <input 
+                name="username" 
+                value={formData.username} 
+                onChange={onChange} 
+                className={inputClass} 
+                placeholder="Ej. amendoza"
+                required 
+              />
             </div>
             <div>
-              <label className={labelClass}>Nueva Contraseña</label>
+              <label className={labelClass}>Contraseña</label>
               <input 
                 type="password" 
                 name="password" 
                 value={formData.password} 
                 onChange={onChange} 
                 className={inputClass} 
-                placeholder="Dejar vacío para mantener actual" 
+                placeholder="Mínimo 6 caracteres" 
               />
             </div>
           </div>
