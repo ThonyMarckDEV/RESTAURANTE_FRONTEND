@@ -2,18 +2,15 @@ import { fetchWithAuth } from 'js/authToken';
 import API_BASE_URL from 'js/urlHelper';
 import { handleResponse } from 'utilities/Responses/handleResponse'; 
 
-const BASE_URL = `${API_BASE_URL}/api/categorias`;
+const BASE_URL = `${API_BASE_URL}/api/platos`;
 
-export const getCategorias = async (pageNumber = 1, search = '', type = null) => {
+// Listar paginado
+export const getPlatos = async (pageNumber = 1, search = '') => {
   const params = new URLSearchParams({
     page: pageNumber - 1,
     size: 10,
   });
-  
   if (search.trim()) params.append('search', search);
-  
-  // Si enviamos un tipo, lo agregamos a la URL
-  if (type !== null) params.append('type', type);
 
   const response = await fetchWithAuth(`${BASE_URL}?${params.toString()}`, { 
     method: 'GET', 
@@ -22,7 +19,8 @@ export const getCategorias = async (pageNumber = 1, search = '', type = null) =>
   return handleResponse(response);
 };
 
-export const createCategoria = async (data) => {
+// Crear
+export const createPlato = async (data) => {
   const response = await fetchWithAuth(BASE_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -31,12 +29,14 @@ export const createCategoria = async (data) => {
   return handleResponse(response);
 };
 
-export const showCategoria = async (id) => {
+// Obtener por ID
+export const showPlato = async (id) => {
   const response = await fetchWithAuth(`${BASE_URL}/${id}`, { method: 'GET' });
   return handleResponse(response);
 };
 
-export const updateCategoria = async (id, data) => {
+// Actualizar
+export const updatePlato = async (id, data) => {
   const response = await fetchWithAuth(`${BASE_URL}/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -45,7 +45,8 @@ export const updateCategoria = async (id, data) => {
   return handleResponse(response);
 };
 
-export const toggleCategoriaEstado = async (id) => {
+// Cambiar estado
+export const togglePlatoEstado = async (id) => {
     const response = await fetchWithAuth(`${BASE_URL}/${id}/status`, {
         method: 'PATCH',
         headers: { 'Accept': 'application/json' }

@@ -4,7 +4,7 @@ import { Bars3Icon, ChevronDownIcon, ClipboardDocumentCheckIcon, DocumentTextIco
 import jwtUtils from 'utilities/Token/jwtUtils';
 import { logout } from 'js/logout';
 import ConfirmModal from 'components/Shared/Modals/ConfirmModal';
-import { BeefIcon, Box, Building, ChartBarIcon, Home, Settings, ShoppingBasket, ShoppingCartIcon, UserCircle2Icon, UserIcon } from 'lucide-react';
+import { BeefIcon, Box, Building, ChartBarIcon, Home, Settings, ShoppingBasket, ShoppingCartIcon, Soup, UserCircle2Icon, UserIcon } from 'lucide-react';
 import { FaCashRegister, FaMoneyBill } from 'react-icons/fa';
 
 const menus = {
@@ -13,7 +13,7 @@ const menus = {
         { section: 'Sedes', icon: Building, subs: [{ name: 'Agregar Sede', link: '/superadmin/agregar-sede' }, { name: 'Listar Sedes', link: '/superadmin/listar-sedes' }] },
         { section: 'Categorías', icon: ListBulletIcon, subs: [{ name: 'Agregar Categoría', link: '/superadmin/agregar-categoria' }, { name: 'Listar Categorías', link: '/superadmin/listar-categorias' }] },
         { section: 'Proveedores', icon: UserIcon, subs: [{ name: 'Agregar Proveedor', link: '/superadmin/agregar-proveedor' }, { name: 'Listar Proveedores', link: '/superadmin/listar-proveedores' }] },
-        { section: 'Productos', icon: DocumentTextIcon, subs: [{ name: 'Agregar Producto', link: '/superadmin/agregar-producto' }, { name: 'Listar Productos', link: '/superadmin/listar-productos' }] },
+        { section: 'Insumos', icon: BeefIcon, subs: [{ name: 'Agregar Insumo', link: '/superadmin/agregar-insumo' }, { name: 'Listar Insumos', link: '/superadmin/listar-insumos' }] },
         { section: 'Sesiones Caja', icon: FaCashRegister, subs: [{ name: 'Listar Sesiones Caja', link: '/superadmin/listar-sesiones-caja' }] },
         { section: 'Ventas', icon: ShoppingCartIcon, subs: [{ name: 'Listar Ventas', link: '/superadmin/listar-ventas' }] },
         { section: 'Comprobantes', icon: ListBulletIcon, subs: [{ name: 'Listar Comprobantes', link: '/superadmin/listar-comprobantes' }] },
@@ -24,10 +24,11 @@ const menus = {
     admin: [
         { section: 'Home', icon: Home, link: '/admin' },
         { section: 'Almacenes', icon: Box, subs: [{ name: 'Agregar Almacen', link: '/admin/agregar-almacen' }, { name: 'Listar Almacenes', link: '/admin/listar-almacenes' }] },
-        { section: 'Insumos', icon: BeefIcon, subs: [{ name: 'Agregar Insumo', link: '/admin/agregar-insumo' }, { name: 'Listar Insumos', link: '/admin/listar-insumos' }] },
         { section: 'Cajeros', icon: UserCircle2Icon, subs: [{ name: 'Agregar Cajero', link: '/admin/agregar-cajero' }, { name: 'Listar Cajeros', link: '/admin/listar-cajeros' }] },
         { section: 'Cajas', icon: FaMoneyBill, subs: [{ name: 'Agregar Caja', link: '/admin/agregar-caja' }, { name: 'Listar Cajas', link: '/admin/listar-cajas' }] },
         { section: 'Sesiones Caja', icon: FaCashRegister, subs: [{ name: 'Listar Sesiones Caja', link: '/admin/listar-sesiones-caja' }] },
+        { section: 'Productos', icon: DocumentTextIcon, subs: [{ name: 'Agregar Producto', link: '/admin/agregar-producto-venta' }, { name: 'Listar Productos', link: '/admin/listar-productos-venta' }] },
+        { section: 'Platos', icon: Soup, subs: [{ name: 'Agregar Plato', link: '/admin/agregar-plato' }, { name: 'Listar Platos', link: '/admin/listar-platos' }] },
         { section: 'Compras', icon: ShoppingBasket, subs: [{ name: 'Agregar Compra', link: '/admin/agregar-compra' }, { name: 'Listar Compras', link: '/admin/listar-compras' }] },
         { section: 'Ventas', icon: ShoppingCartIcon, subs: [{ name: 'Listar Ventas', link: '/admin/listar-ventas' }] },
         { section: 'Comprobantes', icon: ListBulletIcon, subs: [{ name: 'Listar Comprobantes', link: '/admin/listar-comprobantes' }] },

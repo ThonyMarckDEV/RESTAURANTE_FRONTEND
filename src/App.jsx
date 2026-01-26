@@ -11,6 +11,7 @@ import { ToastContainer } from 'react-toastify';
 
 // Layout
 import SidebarLayout from 'layouts/SidebarLayout';
+import SedeLayout from 'layouts/SedeLayout';
 
 // UIS AUTH
 import ErrorPage404 from 'components/ErrorPage404';
@@ -34,16 +35,24 @@ import Home from 'ui/home/Home';
   import AgregarProveedor from 'ui/SuperAdministrador/proveedores/agregarProveedor/AgregarProveedor';
   import ListarProveedores from 'ui/SuperAdministrador/proveedores/listarProveedor/ListarProveedores';
   import EditarProveedor from 'ui/SuperAdministrador/proveedores/editarProveedor/EditarProveedor';
+  //RUTAS INSUMOS
+  import AgregarInsumo from 'ui/SuperAdministrador/insumos/agregarInsumo/AgregarInsumo';
+  import ListarInsumos from 'ui/SuperAdministrador/insumos/listarInsumos/ListarInsumos';
+  import EditarInsumo  from 'ui/SuperAdministrador/insumos/editarInsumo/EditarInsumo';
 
 // UIS ADMIN
   //RUTAS ALMACEN
   import AgregarAlmacen from 'ui/Administrador/almacenes/agregarAlmacen/AgregarAlmacen';
   import ListarAlmacenes from 'ui/Administrador/almacenes/listarAlmacenes/ListarAlmacenes';
   import EditarAlmacen from 'ui/Administrador/almacenes/editarAlmacen/EditarAlmacen';
-  //RUTAS INSUMOS
-  import AgregarInsumo from 'ui/Administrador/insumos/agregarInsumo/AgregarInsumo';
-  import ListarInsumos from 'ui/Administrador/insumos/listarInsumos/ListarInsumos';
-  import EditarInsumo  from 'ui/Administrador/insumos/editarInsumo/EditarInsumo';
+  //RUTAS PRODUCTOS
+  import AgregarProductoVenta from 'ui/Administrador/productos/agregarProductoVenta/AgregarProductoVenta';
+  import ListarProductosVenta from 'ui/Administrador/productos/listarProductosVenta/ListarProductosVenta';
+  import EditarProductoVenta from 'ui/Administrador/productos/editarProductoVenta/EditarProductoVenta';
+  //RUTAS PLATOS
+  import AgregarPlato from 'ui/Administrador/platos/agregarPlato/AgregarPlato';
+  import ListarPlatos from 'ui/Administrador/platos/listarPlatos/ListarPlatos';
+  import EditarPlato from 'ui/Administrador/platos/editarPlato/EditarPlato';
 
 
 // Utilities
@@ -65,7 +74,11 @@ function AppContent() {
         path="/superadmin"
         element={
           <ProtectedRoute
-             element={<SidebarLayout />}
+              element={
+               <SedeLayout>
+                <SidebarLayout />
+               </SedeLayout>
+              }
              allowedRoles={['superadmin']}
             />
         }
@@ -97,6 +110,15 @@ function AppContent() {
           {/* Ruta Editar Proveedor */}
           <Route path="editar-proveedor/:id" element={<EditarProveedor />} />
 
+        {/* RUTAS INSUMOS */}
+          {/* Ruta Agregar Insumo */}
+          <Route path="agregar-insumo" element={<AgregarInsumo />} />
+          {/* Ruta Listar Insumos */}
+          <Route path="listar-insumos" element={<ListarInsumos />} />
+          {/* Ruta Editar Insumo */}
+          <Route path="editar-insumo/:id" element={<EditarInsumo />} />
+
+
 
       </Route>
 
@@ -106,7 +128,11 @@ function AppContent() {
         path="/admin"
         element={
           <ProtectedRoute 
-            element={<SidebarLayout />} 
+            element={
+              <SedeLayout>
+                <SidebarLayout />
+              </SedeLayout>
+            } 
             allowedRoles={['admin']}
           />
         }
@@ -122,13 +148,22 @@ function AppContent() {
           {/* Ruta Editar Almacen */}
           <Route path="editar-almacen/:id" element={<EditarAlmacen />} />
 
-        {/* RUTAS INSUMOS */}
-          {/* Ruta Agregar Insumo */}
-          <Route path="agregar-insumo" element={<AgregarInsumo />} />
-          {/* Ruta Listar Insumos */}
-          <Route path="listar-insumos" element={<ListarInsumos />} />
-          {/* Ruta Editar Insumo */}
-          <Route path="editar-insumo/:id" element={<EditarInsumo />} />
+        {/* RUTAS PRODUCTOS */}
+          {/* Ruta Agregar Producto */}
+          <Route path="agregar-producto-venta" element={<AgregarProductoVenta />} />
+          {/* Ruta Listar Productos */}
+          <Route path="listar-productos-venta" element={<ListarProductosVenta />} />
+          {/* Ruta Editar Producto */}
+          <Route path="editar-producto-venta/:id" element={<EditarProductoVenta />} />
+
+        {/* RUTAS PLATOS */}
+          {/* Ruta Agregar Plato */}
+          <Route path="agregar-plato" element={<AgregarPlato />} />
+          {/* Ruta Listar Platos */}
+          <Route path="listar-platos" element={<ListarPlatos />} />
+          {/* Ruta Editar Plato */}
+          <Route path="editar-plato/:id" element={<EditarPlato />} />
+
 
       </Route>
 
@@ -139,7 +174,11 @@ function AppContent() {
         path="/cajero"
         element={
           <ProtectedRoute 
-           element={<SidebarLayout />} 
+            element={
+              <SedeLayout>
+                <SidebarLayout />
+              </SedeLayout>
+            } 
            allowedRoles={['cajero']}
           />
         }
@@ -157,7 +196,11 @@ function AppContent() {
         path="/mesero"
         element={
           <ProtectedRoute 
-           element={<SidebarLayout />} 
+            element={
+              <SedeLayout>
+                <SidebarLayout />
+              </SedeLayout>
+            } 
            allowedRoles={['mesero']}
           />
         }

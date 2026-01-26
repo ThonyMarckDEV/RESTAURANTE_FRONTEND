@@ -22,14 +22,15 @@ const AgregarInsumo = () => {
   const [alert, setAlert] = useState(null);
 
   // Cargar categorías al montar
-  useEffect(() => {
+ useEffect(() => {
     const fetchCats = async () => {
         try {
-            const response = await getCategorias(1, ''); // Traer primera página o ajustar backend para "listar todas"
-            // Ajustar según si tu backend devuelve paginación o lista directa
+            // Enviamos '1' como tercer argumento para filtrar solo categorías de tipo INSUMO
+            const response = await getCategorias(1, '', 1); 
+            
             setCategorias(response.data.content || response.data);
         } catch (error) {
-            setAlert({ type: 'error', message: 'Error al cargar categorías. Verifique su conexión.' });
+            setAlert({ type: 'error', message: 'Error al cargar categorías.' });
         }
     };
     fetchCats();
@@ -52,7 +53,7 @@ const AgregarInsumo = () => {
     try {
       await createInsumo(formData);
       setAlert({ type: 'success', message: 'Insumo registrado correctamente.' });
-      setTimeout(() => navigate('/admin/listar-insumos'), 1500);
+      setTimeout(() => navigate('/superadmin/listar-insumos'), 1500);
     } catch (err) {
       const details = err.details ? Object.values(err.details).flat() : [];
       setAlert({ type: 'error', message: err.message || 'Error al crear', details });
@@ -65,7 +66,7 @@ const AgregarInsumo = () => {
     <div className="container mx-auto p-6 min-h-screen">
       <div className="flex justify-between items-center mb-8 border-b-2 border-restaurant-secondary/20 pb-4">
           <h1 className="text-3xl font-serif font-bold text-restaurant-primary">Nuevo Insumo</h1>
-          <button onClick={() => navigate('/admin/listar-insumos')} className="text-restaurant-secondary font-bold">← Cancelar</button>
+          <button onClick={() => navigate('/superadmin/listar-insumos')} className="text-restaurant-secondary font-bold">← Cancelar</button>
       </div>
       <AlertMessage type={alert?.type} message={alert?.message} details={alert?.details} onClose={() => setAlert(null)} />
       
