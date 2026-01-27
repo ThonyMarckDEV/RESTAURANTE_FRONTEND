@@ -82,7 +82,6 @@ const AgregarInsumo = () => {
                 <InsumoForm 
                     formData={formData} 
                     onChange={handleChange} 
-                    tipoCategoria={1} 
                 />
 
                 <div className="flex justify-center mt-8">
