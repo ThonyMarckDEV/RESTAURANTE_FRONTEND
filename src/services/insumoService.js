@@ -5,12 +5,19 @@ import { handleResponse } from 'utilities/Responses/handleResponse';
 const BASE_URL = `${API_BASE_URL}/api/insumos`;
 
 // Listar paginado
-export const getInsumos = async (pageNumber = 1, search = '') => {
+export const getInsumos = async (pageNumber = 1, filters = {}) => {
   const params = new URLSearchParams({
     page: pageNumber - 1,
     size: 10,
   });
-  if (search.trim()) params.append('search', search);
+
+  // Agregamos filtros si existen
+  if (filters.search) params.append('search', filters.search);
+  if (filters.categoriaId) params.append('categoriaId', filters.categoriaId);
+  if (filters.unidad) params.append('unidad', filters.unidad);
+  if (filters.minPrecio) params.append('minPrecio', filters.minPrecio);
+  if (filters.maxPrecio) params.append('maxPrecio', filters.maxPrecio);
+  if (filters.estado !== '') params.append('estado', filters.estado); // 0 o 1
 
   const response = await fetchWithAuth(`${BASE_URL}?${params.toString()}`, { 
     method: 'GET', 

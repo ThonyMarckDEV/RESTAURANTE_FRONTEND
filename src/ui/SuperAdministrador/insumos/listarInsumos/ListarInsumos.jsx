@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { getInsumos, toggleInsumoEstado } from 'services/insumoService'; 
-import LoadingScreen from 'components/Shared/LoadingScreen';
 import AlertMessage from 'components/Shared/Errors/AlertMessage';
 import ConfirmModal from 'components/Shared/Modals/ConfirmModal';
-import Table from 'components/Shared/Tables/Table';
+import Table from 'components/Shared/Tables/Table'; // Tu componente Table
 import { PencilSquareIcon, ArchiveBoxIcon, TagIcon, QrCodeIcon } from '@heroicons/react/24/outline';
 
 const ListarInsumos = () => {
@@ -13,11 +12,72 @@ const ListarInsumos = () => {
     const [itemToToggle, setItemToToggle] = useState(null);
     const [insumos, setInsumos] = useState([]);
     const [paginationInfo, setPaginationInfo] = useState({ currentPage: 1, totalPages: 1 });
-    const [searchTerm, setSearchTerm] = useState('');
 
+    // --- ESTADOS ---
+    const [filters, setFilters] = useState({
+        search: '',
+        unidad: '',
+        estado: '',
+        minPrecio: '',
+        maxPrecio: ''
+    });
+
+    // --- CONFIGURACIÓN DE FILTROS PARA LA TABLA ---
+    const filtersList = useMemo(() => [
+        {
+            id: 'search',
+            label: 'Nombre / Código',
+            type: 'text',
+            value: filters.search,
+            placeholder: 'Buscar insumo...',
+            onChange: (val) => setFilters(prev => ({ ...prev, search: val }))
+        },
+        {
+            id: 'unidad',
+            label: 'Unidad',
+            type: 'select',
+            value: filters.unidad,
+            onChange: (val) => setFilters(prev => ({ ...prev, unidad: val })),
+            options: [
+                { value: 'KG', label: 'Kilogramos (KG)' },
+                { value: 'LT', label: 'Litros (LT)' },
+                { value: 'UNIDAD', label: 'Unidades (UNIDAD)' }
+            ]
+        },
+        {
+            id: 'estado',
+            label: 'Estado',
+            type: 'select',
+            value: filters.estado,
+            onChange: (val) => setFilters(prev => ({ ...prev, estado: val })),
+            options: [
+                { value: '1', label: 'Activos' },
+                { value: '0', label: 'Inactivos' }
+            ]
+        },
+        {
+            id: 'minPrecio',
+            label: 'Costo Mínimo',
+            type: 'text',
+            value: filters.minPrecio,
+            placeholder: '0.00',
+            onChange: (val) => setFilters(prev => ({ ...prev, minPrecio: val }))
+        },
+        {
+            id: 'maxPrecio',
+            label: 'Costo Máximo',
+            type: 'text',
+            value: filters.maxPrecio,
+            placeholder: '0.00',
+            onChange: (val) => setFilters(prev => ({ ...prev, maxPrecio: val }))
+        }
+    ], [filters]);
+
+    // --- COLUMNAS ---
     const columns = useMemo(() => [
         {
             header: 'Insumo',
+            accessor: 'nombre', // Fallback si no hay render
             render: (row) => (
                 <div className="flex flex-col">
                     <div className="flex items-center gap-2">
@@ -94,10 +154,11 @@ const ListarInsumos = () => {
         }
     ], []);
 
-    const fetchInsumos = useCallback(async (page, search = '') => {
+    // --- CARGA DE DATOS ---
+    const fetchInsumos = useCallback(async (page, currentFilters) => {
         setLoading(true);
         try {
-            const response = await getInsumos(page, search);
+            const response = await getInsumos(page, currentFilters);
             setInsumos(response.data.content);
             setPaginationInfo({ currentPage: response.data.currentPage, totalPages: response.data.totalPages });
         } catch (err) {
@@ -107,22 +168,33 @@ const ListarInsumos = () => {
         }
     }, []);
 
+    // Debounce para filtros
     useEffect(() => {
-        const handler = setTimeout(() => fetchInsumos(1, searchTerm), 500);
+        const handler = setTimeout(() => {
+            fetchInsumos(1, filters);
+        }, 500);
         return () => clearTimeout(handler);
-    }, [searchTerm, fetchInsumos]);
+    }, [filters, fetchInsumos]);
+
+    const clearFilters = () => {
+        setFilters({
+            search: '',
+            unidad: '',
+            estado: '',
+            minPrecio: '',
+            maxPrecio: ''
+        });
+    };
 
     const handleToggle = async () => {
         const id = itemToToggle.id;
         setItemToToggle(null);
         try {
             await toggleInsumoEstado(id);
-            fetchInsumos(paginationInfo.currentPage, searchTerm);
+            fetchInsumos(paginationInfo.currentPage, filters);
             setAlert({ type: 'success', message: 'Estado del insumo actualizado.' });
         } catch (err) { setAlert({ type: 'error', message: 'Error al cambiar estado.' }); }
     };
-
-    if (loading && insumos.length === 0) return <LoadingScreen />;
 
     return (
         <div className="container mx-auto p-6 min-h-screen">
@@ -137,7 +209,7 @@ const ListarInsumos = () => {
             </div>
             
             <AlertMessage type={alert?.type} message={alert?.message} onClose={() => setAlert(null)} />
-            
+
             {itemToToggle && (
                 <ConfirmModal 
                     message={`¿Estás seguro de cambiar el estado de "${itemToToggle.nombre}"?`} 
@@ -146,10 +218,18 @@ const ListarInsumos = () => {
                 />
             )}
 
+            {/* AHORA PASAMOS LOS FILTROS COMO ARRAY AL COMPONENTE TABLE */}
             <Table 
-                columns={columns} data={insumos} loading={loading}
-                pagination={{ currentPage: paginationInfo.currentPage, totalPages: paginationInfo.totalPages, onPageChange: (page) => fetchInsumos(page, searchTerm) }}
-                onSearch={setSearchTerm} searchPlaceholder="Buscar insumo..."
+                columns={columns} 
+                data={insumos} 
+                loading={loading}
+                filters={filtersList} // <--- Array de configuración
+                onClearFilters={clearFilters}
+                pagination={{ 
+                    currentPage: paginationInfo.currentPage, 
+                    totalPages: paginationInfo.totalPages, 
+                    onPageChange: (page) => fetchInsumos(page, filters) 
+                }}
             />
         </div>
     );
