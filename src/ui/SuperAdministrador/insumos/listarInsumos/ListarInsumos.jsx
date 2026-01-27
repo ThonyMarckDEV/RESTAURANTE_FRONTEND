@@ -41,7 +41,7 @@ const ListarInsumos = () => {
             label: 'Categoría',
             component: (
                 <CategoriaSearchSelect 
-                    categoryTypes={[1]} // 1 = Insumos
+                    categoryTypes={[1]} // 1 = INSUMOS
                     initialValue={selectedCategoryObj}
                     onSelect={(cat) => {
                         setSelectedCategoryObj(cat);
