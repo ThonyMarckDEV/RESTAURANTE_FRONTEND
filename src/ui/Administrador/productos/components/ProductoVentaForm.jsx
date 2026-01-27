@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import CategoriaSearchSelect from 'components/Shared/Comboboxes/CategoriaSearchSelect';
-import { ShoppingBagIcon, CurrencyDollarIcon, StarIcon, CalculatorIcon } from '@heroicons/react/24/outline';
+import { CurrencyDollarIcon, StarIcon, CalculatorIcon } from '@heroicons/react/24/outline';
+import { PillBottle } from 'lucide-react';
 
 const ProductoVentaForm = ({ formData, onChange }) => {
     
@@ -24,7 +25,7 @@ const ProductoVentaForm = ({ formData, onChange }) => {
             {/* Encabezado */}
             <div className="flex items-center gap-3 mb-6 border-b border-gray-100 pb-3">
                 <div className="p-2 bg-restaurant-surface rounded-full">
-                    <ShoppingBagIcon className="w-6 h-6 text-restaurant-secondary" />
+                    <PillBottle className="w-6 h-6 text-restaurant-secondary" />
                 </div>
                 <h2 className="text-lg font-bold text-gray-800">Datos del Producto</h2>
             </div>

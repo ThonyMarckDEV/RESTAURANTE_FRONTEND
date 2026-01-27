@@ -5,7 +5,8 @@ import CategoriaSearchSelect from 'components/Shared/Comboboxes/CategoriaSearchS
 import AlertMessage from 'components/Shared/Errors/AlertMessage';
 import ConfirmModal from 'components/Shared/Modals/ConfirmModal';
 import Table from 'components/Shared/Tables/Table';
-import { PencilSquareIcon, ShoppingBagIcon, TagIcon } from '@heroicons/react/24/outline';
+import { PencilSquareIcon, TagIcon } from '@heroicons/react/24/outline';
+import { PillBottle, PillBottleIcon } from 'lucide-react';
 
 const ListarProductosVenta = () => {
     const [loading, setLoading] = useState(true);
@@ -67,7 +68,7 @@ const ListarProductosVenta = () => {
             render: (row) => (
                 <div className="flex flex-col">
                     <div className="flex items-center gap-2">
-                        <ShoppingBagIcon className="w-5 h-5 text-restaurant-primary"/>
+                        <PillBottleIcon className="w-5 h-5 text-restaurant-primary"/>
                         <span className="font-bold text-gray-800">{row.nombre}</span>
                     </div>
                     {row.marca && (
@@ -169,10 +170,10 @@ const ListarProductosVenta = () => {
             <div className="flex justify-between items-center mb-8">
                 <div>
                     <h1 className="text-3xl font-serif font-bold text-restaurant-primary">Productos Venta</h1>
-                    <p className="text-sm text-gray-500 mt-1">Gaseosas, Cervezas, Galletas, etc.</p>
+                    <p className="text-sm text-gray-500 mt-1">Gaseosas, Cervezas, etc.</p>
                 </div>
                 <Link to="/admin/agregar-producto-venta" className="bg-restaurant-primary text-white px-5 py-2.5 rounded-lg font-bold flex items-center gap-2 shadow-md hover:bg-red-900 transition-colors">
-                    <ShoppingBagIcon className="w-5 h-5"/> Nuevo Producto
+                    <PillBottle className="w-5 h-5"/> Nuevo Producto
                 </Link>
             </div>
             
