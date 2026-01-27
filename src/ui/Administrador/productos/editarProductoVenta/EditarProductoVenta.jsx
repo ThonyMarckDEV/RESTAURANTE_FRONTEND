@@ -9,8 +9,16 @@ import ProductoVentaForm from '../components/ProductoVentaForm';
 const EditarProductoVenta = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({ 
-    categoriaId: '', nombre: '', marca: '', precioCompra: 0, precioVenta: 0, stockMinimo: 10, estado: 1 
+    categoriaId: '', 
+    categoriaNombre: '',
+    nombre: '', 
+    marca: '', 
+    precioCompra: 0, 
+    precioVenta: 0, 
+    stockMinimo: 10, 
+    estado: 1 
   });
   
   const [categorias, setCategorias] = useState([]);
@@ -22,14 +30,20 @@ const EditarProductoVenta = () => {
       try {
         const [prodRes, catsRes] = await Promise.all([
             showProductoVenta(id),
-            getCategorias(1, '', 2) // TIPO 2
+            getCategorias(1, '', 2) // 2 = PRODUCTOS
         ]);
 
-        setCategorias(catsRes.data.content || catsRes.data);
+        const listaCategorias = catsRes.data.content || catsRes.data;
+        setCategorias(listaCategorias);
 
         const data = prodRes.data;
+
+        const catEncontrada = listaCategorias.find(c => c.id === data.categoria_id);
+        const nombreCategoria = catEncontrada ? catEncontrada.nombre : '';
+
         setFormData({
           categoriaId: data.categoria_id,
+          categoriaNombre: nombreCategoria,
           nombre: data.nombre,
           marca: data.marca,
           precioCompra: data.precio_compra,
@@ -39,6 +53,7 @@ const EditarProductoVenta = () => {
         });
 
       } catch (err) {
+        console.error(err);
         setAlert({ type: 'error', message: 'No se pudo cargar la información.' });
       } finally {
         setLoading(false);
@@ -78,10 +93,11 @@ const EditarProductoVenta = () => {
       <AlertMessage type={alert?.type} message={alert?.message} details={alert?.details} onClose={() => setAlert(null)} />
       
       <form onSubmit={handleSubmit}>
+          {/* Al pasar formData con categoriaNombre, el hook interno del Form funcionará */}
           <ProductoVentaForm formData={formData} onChange={handleChange} categorias={categorias} />
+          
           <div className="flex justify-center mt-8">
             <button disabled={loading} className="px-10 py-3 text-white bg-restaurant-primary rounded-lg font-bold shadow-lg">
-                {/* AQUÍ ESTABA EL ERROR, YA CORREGIDO: */}
                 {loading ? 'Guardando...' : 'GUARDAR CAMBIOS'}
             </button>
           </div>

@@ -9,8 +9,14 @@ import PlatoForm from '../components/PlatoForm';
 const EditarPlato = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({ 
-    categoriaId: '', nombre: '', descripcion: '', precioVenta: 0, estado: 1 
+    categoriaId: '', 
+    categoriaNombre: '',
+    nombre: '', 
+    descripcion: '', 
+    precioVenta: 0, 
+    estado: 1 
   });
   
   const [categorias, setCategorias] = useState([]);
@@ -22,14 +28,20 @@ const EditarPlato = () => {
       try {
         const [platoRes, catsRes] = await Promise.all([
             showPlato(id),
-            getCategorias(1, '', 3) // TIPO 3
+            getCategorias(1, '', 3) // 3 = PLATOS
         ]);
 
-        setCategorias(catsRes.data.content || catsRes.data);
+        const listaCategorias = catsRes.data.content || catsRes.data;
+        setCategorias(listaCategorias);
 
         const data = platoRes.data;
+
+        const categoriaEncontrada = listaCategorias.find(c => c.id === data.categoria_id);
+        const nombreCategoria = categoriaEncontrada ? categoriaEncontrada.nombre : '';
+        
         setFormData({
           categoriaId: data.categoria_id,
+          categoriaNombre: nombreCategoria,
           nombre: data.nombre,
           descripcion: data.descripcion,
           precioVenta: data.precio_venta,
@@ -37,6 +49,7 @@ const EditarPlato = () => {
         });
 
       } catch (err) {
+        console.error(err);
         setAlert({ type: 'error', message: 'No se pudo cargar la información.' });
       } finally {
         setLoading(false);
@@ -76,7 +89,9 @@ const EditarPlato = () => {
       <AlertMessage type={alert?.type} message={alert?.message} details={alert?.details} onClose={() => setAlert(null)} />
       
       <form onSubmit={handleSubmit}>
+          {/* El PlatoForm ahora recibirá formData.categoriaNombre y el useEffect interno funcionará */}
           <PlatoForm formData={formData} onChange={handleChange} categorias={categorias} />
+          
           <div className="flex justify-center mt-8">
             <button disabled={loading} className="px-10 py-3 text-white bg-restaurant-primary rounded-lg font-bold shadow-lg">
                 {loading ? 'Guardando...' : 'GUARDAR CAMBIOS'}

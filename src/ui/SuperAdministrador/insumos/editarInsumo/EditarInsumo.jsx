@@ -9,9 +9,16 @@ import InsumoForm from '../components/InsumoForm';
 const EditarInsumo = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({ 
-    categoriaId: '', nombre: '', codigoInterno: '', unidadMedida: 'KG', 
-    precioCompraPromedio: 0, stockMinimo: 5, estado: 1 
+    categoriaId: '', 
+    categoriaNombre: '',
+    nombre: '', 
+    codigoInterno: '', 
+    unidadMedida: 'KG', 
+    precioCompraPromedio: 0, 
+    stockMinimo: 5, 
+    estado: 1 
   });
   
   const [categorias, setCategorias] = useState([]);
@@ -23,14 +30,20 @@ const EditarInsumo = () => {
       try {
         const [insumoRes, catsRes] = await Promise.all([
             showInsumo(id),
-            getCategorias(1, '')
+            getCategorias(1, '', 1)
         ]);
 
-        setCategorias(catsRes.data.content || catsRes.data);
+        const listaCategorias = catsRes.data.content || catsRes.data;
+        setCategorias(listaCategorias);
 
         const data = insumoRes.data;
+
+        const catEncontrada = listaCategorias.find(c => c.id === data.categoria_id);
+        const nombreCategoria = catEncontrada ? catEncontrada.nombre : '';
+
         setFormData({
           categoriaId: data.categoria_id,
+          categoriaNombre: nombreCategoria,
           nombre: data.nombre,
           codigoInterno: data.codigo_interno,
           unidadMedida: data.unidad_medida,
@@ -40,6 +53,7 @@ const EditarInsumo = () => {
         });
 
       } catch (err) {
+        console.error(err);
         setAlert({ type: 'error', message: 'No se pudo cargar la información.' });
       } finally {
         setLoading(false);
@@ -79,6 +93,7 @@ const EditarInsumo = () => {
       <AlertMessage type={alert?.type} message={alert?.message} details={alert?.details} onClose={() => setAlert(null)} />
       
       <form onSubmit={handleSubmit}>
+          {/* InsumoForm ahora recibirá el nombre correcto para inicializar el combobox */}
           <InsumoForm formData={formData} onChange={handleChange} categorias={categorias} />
           <div className="flex justify-center mt-8">
             <button disabled={loading} className="px-10 py-3 text-white bg-restaurant-primary rounded-lg font-bold shadow-lg">
