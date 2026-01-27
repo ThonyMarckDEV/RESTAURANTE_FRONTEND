@@ -1,135 +1,148 @@
 import React from 'react';
-import { ArchiveBoxIcon, TagIcon, CurrencyDollarIcon, ScaleIcon, QrCodeIcon } from '@heroicons/react/24/outline';
+import CategoryComboBox from 'components/Shared/Comboboxes/CategoriaSearchSelect';
 
-const InsumoForm = ({ formData, onChange, categorias = [] }) => {
-  const inputClass = "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-1 focus:ring-restaurant-secondary focus:border-restaurant-secondary outline-none text-sm transition-all";
-  const labelClass = "block text-xs font-bold text-gray-600 mb-1";
+const InsumoForm = ({ formData, onChange, tipoCategoria }) => {
+    
+    const unidades = [
+        { value: 'KG', label: 'KILOGRAMOS (KG)' },
+        { value: 'LT', label: 'LITROS (L)' },
+        { value: 'UNIDAD', label: 'UNIDAD (UND)' },
+        { value: 'LATA', label: 'LATA' },
+        { value: 'PAQUETE', label: 'PAQUETE' }
+    ];
 
-  return (
-    <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-restaurant-primary h-fit max-w-4xl mx-auto">
-      <div className="flex items-center gap-3 mb-6 border-b border-gray-100 pb-3">
-        <div className="p-2 bg-restaurant-surface rounded-full">
-          <ArchiveBoxIcon className="w-6 h-6 text-restaurant-secondary" />
-        </div>
-        <h2 className="text-lg font-bold text-gray-800">Datos del Insumo</h2>
-      </div>
+    return (
+        <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
+            <h2 className="text-xl font-bold text-gray-800 mb-6 border-l-4 border-restaurant-primary pl-3">
+                Información del Insumo
+            </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
-        {/* Columna Izquierda */}
-        <div className="space-y-4">
-            {/* Categoría */}
-            <div>
-               <label className={labelClass}>Categoría</label>
-               <div className="relative">
-                 <TagIcon className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                 <select 
-                    name="categoriaId" 
-                    value={formData.categoriaId} 
-                    onChange={onChange} 
-                    className={`${inputClass} pl-10`}
-                    required
-                 >
-                    <option value="">-- Seleccione Categoría --</option>
-                    {categorias.map(cat => (
-                        <option key={cat.id} value={cat.id}>{cat.nombre}</option>
-                    ))}
-                 </select>
-               </div>
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                {/* 1. Categoría */}
+                <div className="col-span-1 md:col-span-2">
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                        Categoría <span className="text-red-500">*</span>
+                    </label>
+                    <CategoryComboBox
+                        value={formData.categoriaId}
+                        // CORRECCIÓN AQUÍ: Cambiamos 'onChange' por 'onSelect'
+                        // porque tu componente hijo espera recibir 'onSelect'
+                        onSelect={(newId) => onChange({ target: { name: 'categoriaId', value: newId } })}
+                        
+                        tipoCategoria={tipoCategoria}
+                        placeholder="Buscar y seleccionar categoría..."
+                        error={!formData.categoriaId}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                        Escriba para buscar entre las categorías de insumos disponibles.
+                    </p>
+                </div>
 
-            {/* Nombre */}
-            <div>
-              <label className={labelClass}>Nombre del Insumo</label>
-              <input 
-                name="nombre" 
-                value={formData.nombre} 
-                onChange={onChange} 
-                className={inputClass} 
-                placeholder="Ej: Lomo Fino, Arroz Extra, Aceite"
-                required 
-              />
-            </div>
+                {/* 2. Nombre */}
+                <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                        Nombre del Insumo <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        name="nombre"
+                        value={formData.nombre}
+                        onChange={onChange}
+                        placeholder="Ej: Papa Amarilla, Aceite Vegetal..."
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent transition-all outline-none"
+                        required
+                    />
+                </div>
 
-            {/* Código Interno */}
-            <div>
-              <label className={labelClass}>Código Interno (Opcional)</label>
-              <div className="relative">
-                <QrCodeIcon className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                <input 
-                    name="codigoInterno" 
-                    value={formData.codigoInterno || ''} 
-                    onChange={onChange} 
-                    className={`${inputClass} pl-10`} 
-                    placeholder="Ej: INS-001"
-                />
-              </div>
-            </div>
-        </div>
+                {/* 3. Código Interno */}
+                <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                        Código Interno / SKU
+                    </label>
+                    <input
+                        type="text"
+                        name="codigoInterno"
+                        value={formData.codigoInterno}
+                        onChange={onChange}
+                        placeholder="Ej: INS-001"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent transition-all outline-none"
+                    />
+                </div>
 
-        {/* Columna Derecha */}
-        <div className="space-y-4">
-            {/* Unidad de Medida */}
-            <div>
-                <label className={labelClass}>Unidad de Medida</label>
-                <div className="relative">
-                    <ScaleIcon className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                    <select name="unidadMedida" value={formData.unidadMedida} onChange={onChange} className={`${inputClass} pl-10`}>
-                        <option value="KG">Kilogramos (KG)</option>
-                        <option value="LT">Litros (LT)</option>
-                        <option value="UNIDAD">Unidad (UND)</option>
-                        <option value="PAQUETE">Paquete</option>
-                        <option value="LATA">Lata</option>
+                {/* 4. Unidad de Medida */}
+                <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                        Unidad de Medida <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                        name="unidadMedida"
+                        value={formData.unidadMedida}
+                        onChange={onChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent bg-white"
+                        required
+                    >
+                        {unidades.map((u) => (
+                            <option key={u.value} value={u.value}>
+                                {u.label}
+                            </option>
+                        ))}
                     </select>
                 </div>
-            </div>
 
-            <div className="grid grid-cols-2 gap-4">
-                {/* Precio Compra */}
+                {/* 5. Precio Compra Promedio */}
                 <div>
-                    <label className={labelClass}>Costo Promedio</label>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                        Precio Compra Referencial (S/.)
+                    </label>
                     <div className="relative">
-                        <CurrencyDollarIcon className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                        <input 
+                        <span className="absolute left-3 top-2 text-gray-500">S/.</span>
+                        <input
                             type="number"
+                            name="precioCompraPromedio"
+                            value={formData.precioCompraPromedio}
+                            onChange={onChange}
                             step="0.01"
-                            name="precioCompraPromedio" 
-                            value={formData.precioCompraPromedio} 
-                            onChange={onChange} 
-                            className={`${inputClass} pl-10`}
-                            placeholder="0.00"
+                            min="0"
+                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent outline-none"
                         />
                     </div>
                 </div>
 
-                {/* Stock Mínimo */}
+                {/* 6. Stock Mínimo */}
                 <div>
-                    <label className={labelClass}>Stock Mínimo (Alerta)</label>
-                    <input 
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                        Stock Mínimo Alerta <span className="text-red-500">*</span>
+                    </label>
+                    <input
                         type="number"
-                        step="0.01"
-                        name="stockMinimo" 
-                        value={formData.stockMinimo} 
-                        onChange={onChange} 
-                        className={inputClass}
-                        placeholder="5.00"
+                        name="stockMinimo"
+                        value={formData.stockMinimo}
+                        onChange={onChange}
+                        min="0"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent outline-none"
+                        required
                     />
                 </div>
-            </div>
 
-            {/* Estado */}
-            <div>
-                <label className={labelClass}>Estado</label>
-                <select name="estado" value={formData.estado} onChange={onChange} className={inputClass}>
-                    <option value={1}>Activo</option>
-                    <option value={0}>Inactivo</option>
-                </select>
+                {/* 7. Estado */}
+                <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                        Estado
+                    </label>
+                    <select
+                        name="estado"
+                        value={formData.estado}
+                        onChange={onChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent bg-white"
+                    >
+                        <option value={1}>Activo</option>
+                        <option value={0}>Inactivo</option>
+                    </select>
+                </div>
             </div>
         </div>
-
-      </div>
-    </div>
-  );
+    );
 };
 
 export default InsumoForm;

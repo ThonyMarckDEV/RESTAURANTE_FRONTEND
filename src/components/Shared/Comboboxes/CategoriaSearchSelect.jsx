@@ -2,12 +2,14 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { getCategorias } from 'services/categoriaService';
 import { TagIcon, ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
-
 const CategoriaSearchSelect = ({ categoryTypes, onSelect, initialValue }) => {
+
     const [inputValue, setInputValue] = useState(initialValue?.nombre || '');
     const [suggestions, setSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [loading, setLoading] = useState(false);
+
+    const lastIdRef = useRef(initialValue?.id);
     const wrapperRef = useRef(null);
 
     const allowedTypes = useMemo(() => {
@@ -16,16 +18,31 @@ const CategoriaSearchSelect = ({ categoryTypes, onSelect, initialValue }) => {
     }, [categoryTypes]);
 
     useEffect(() => {
-        setInputValue(initialValue?.nombre || '');
-    }, [initialValue]);
+        if (!initialValue) {
+            setInputValue('');
+            lastIdRef.current = null;
+            return;
+        }
 
-   const fetchCategorias = async (searchTerm = '') => {
-    setLoading(true);
-    try {
+        const newId = initialValue.id || initialValue;
+        const newName = initialValue.nombre;
+
+        if (newId !== lastIdRef.current) {
+            if (newName) {
+                setInputValue(newName);
+            }
+            lastIdRef.current = newId;
+        }
+
+        
+    }, [initialValue]); 
+    // -----------------------------
+
+    const fetchCategorias = async (searchTerm = '') => {
+        setLoading(true);
+        try {
             const typeForBackend = (allowedTypes && allowedTypes.length === 1) ? allowedTypes[0] : null;
-
             const response = await getCategorias(1, searchTerm, typeForBackend, 1);
-
             let data = response.data.content || response.data || [];
 
             if (allowedTypes && allowedTypes.length > 1) {
@@ -47,23 +64,23 @@ const CategoriaSearchSelect = ({ categoryTypes, onSelect, initialValue }) => {
         const handleClickOutside = (event) => {
             if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
                 setShowSuggestions(false);
-                if (!initialValue?.id && inputValue !== '') setInputValue('');
-                if (initialValue?.id && inputValue !== initialValue.nombre) setInputValue(initialValue.nombre);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [initialValue, inputValue]);
+    }, []);
 
     const handleSelect = (cat) => {
         setInputValue(cat.nombre);
-        onSelect({ id: cat.id, nombre: cat.nombre });
+        lastIdRef.current = cat.id;
+        onSelect({ id: cat.id, nombre: cat.nombre }); 
         setShowSuggestions(false);
     };
 
     const handleClear = (e) => {
         e.stopPropagation();
         setInputValue('');
+        lastIdRef.current = null;
         onSelect(null);
     };
 
@@ -75,7 +92,9 @@ const CategoriaSearchSelect = ({ categoryTypes, onSelect, initialValue }) => {
                     type="text"
                     value={inputValue}
                     placeholder={loading ? "Cargando..." : "Buscar Categoría..."}
-                    onFocus={() => fetchCategorias(inputValue)}
+                    onFocus={() => {
+                        fetchCategorias(inputValue);
+                    }}
                     onChange={(e) => {
                         setInputValue(e.target.value);
                         fetchCategorias(e.target.value);
@@ -83,7 +102,6 @@ const CategoriaSearchSelect = ({ categoryTypes, onSelect, initialValue }) => {
                     className="w-full pl-9 pr-10 py-2 bg-white border border-gray-300 rounded-lg text-sm outline-none transition-all focus:ring-2 focus:ring-restaurant-primary/20 focus:border-restaurant-primary"
                 />
                 
-                {/* Botón de Limpiar o Flecha */}
                 <div className="absolute right-3 top-2.5 cursor-pointer">
                     {inputValue ? (
                         <XMarkIcon className="w-4 h-4 text-gray-400 hover:text-red-500" onClick={handleClear} />
