@@ -42,12 +42,19 @@ const ListarInsumos = () => {
             )
         },
         {
-            header: 'Stock Mín / Unidad',
+            header: 'Stock Mínimo',
             render: (row) => (
-                <div className="text-sm">
-                    <span className="font-bold text-gray-700">{row.stock_minimo}</span>
-                    <span className="ml-1 text-gray-500 text-xs">{row.unidad_medida}</span>
-                </div>
+                <span className="font-bold text-gray-700">
+                    {row.stock_minimo} {row.unidad_medida}
+                </span>
+            )
+        },
+        {
+            header: 'Unidad',
+            render: (row) => (
+                <span className="text-xs font-medium text-gray-500 uppercase">
+                    {row.unidad_medida}
+                </span>
             )
         },
         {
