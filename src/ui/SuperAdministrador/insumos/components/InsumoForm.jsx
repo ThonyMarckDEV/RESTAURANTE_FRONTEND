@@ -26,8 +26,6 @@ const InsumoForm = ({ formData, onChange, tipoCategoria }) => {
                     </label>
                     <CategoryComboBox
                         value={formData.categoriaId}
-                        // CORRECCIÓN AQUÍ: Cambiamos 'onChange' por 'onSelect'
-                        // porque tu componente hijo espera recibir 'onSelect'
                         onSelect={(newId) => onChange({ target: { name: 'categoriaId', value: newId } })}
                         
                         tipoCategoria={tipoCategoria}
