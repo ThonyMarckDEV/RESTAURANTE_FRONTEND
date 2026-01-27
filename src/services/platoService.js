@@ -8,7 +8,7 @@ const BASE_URL = `${API_BASE_URL}/api/platos`;
 export const getPlatos = async (pageNumber = 1, search = '') => {
   const params = new URLSearchParams({
     page: pageNumber - 1,
-    size: 10,
+    size: 6,
   });
   if (search.trim()) params.append('search', search);
 

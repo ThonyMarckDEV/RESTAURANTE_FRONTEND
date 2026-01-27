@@ -8,7 +8,7 @@ const BASE_URL = `${API_BASE_URL}/api/almacenes`;
 export const getAlmacenes = async (pageNumber = 1, search = '', estado = '') => {
   const params = new URLSearchParams({
     page: pageNumber - 1,
-    size: 8,
+    size: 6,
   });
 
   if (search.trim()) params.append('search', search);

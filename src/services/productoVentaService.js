@@ -8,7 +8,7 @@ const BASE_URL = `${API_BASE_URL}/api/productos-venta`;
 export const getProductosVenta = async (pageNumber = 1, search = '', categoriaId = '', estado = '') => {
   const params = new URLSearchParams({
     page: pageNumber - 1,
-    size: 8,
+    size: 6,
   });
 
   if (search.trim()) params.append('search', search);

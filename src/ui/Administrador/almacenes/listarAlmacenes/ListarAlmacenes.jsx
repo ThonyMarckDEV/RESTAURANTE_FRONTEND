@@ -41,8 +41,8 @@ const ListarAlmacenes = () => {
             value: filters.estado,
             onChange: (val) => setFilters(prev => ({ ...prev, estado: val })),
             options: [
-                { value: '1', label: 'Activos' },
-                { value: '0', label: 'Inactivos' }
+                { value: '1', label: 'ACTIVOS' },
+                { value: '0', label: 'INACTIVOS' }
             ]
         }
     ], [filters]);

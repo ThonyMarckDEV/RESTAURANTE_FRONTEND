@@ -8,7 +8,7 @@ const BASE_URL = `${API_BASE_URL}/api/insumos`;
 export const getInsumos = async (pageNumber = 1, filters = {}) => {
   const params = new URLSearchParams({
     page: pageNumber - 1,
-    size: 8,
+    size: 6,
   });
 
   // Agregamos filtros si existen

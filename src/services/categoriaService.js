@@ -7,7 +7,7 @@ const BASE_URL = `${API_BASE_URL}/api/categorias`;
 export const getCategorias = async (pageNumber = 1, search = '', type = '', status = '') => {
   const params = new URLSearchParams({
     page: pageNumber - 1,
-    size: 8,
+    size: 6,
   });
   
   // Filtro por búsqueda

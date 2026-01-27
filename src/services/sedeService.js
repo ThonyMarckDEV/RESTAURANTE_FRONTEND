@@ -15,7 +15,7 @@ export const createSede = async (data) => {
 export const getSedes = async (pageNumber = 1, search = '', status = '') => {
   const params = new URLSearchParams({
     page: pageNumber - 1,
-    size: 8,
+    size: 6,
   });
 
   if (search.trim()) params.append('search', search);
