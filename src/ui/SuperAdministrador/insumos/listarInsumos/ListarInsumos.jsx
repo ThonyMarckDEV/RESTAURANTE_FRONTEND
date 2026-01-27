@@ -83,7 +83,7 @@ const ListarInsumos = () => {
             render: (row) => (
                 <div className="flex justify-start gap-2">
                     <Link 
-                        to={`/admin/editar-insumo/${row.id}`} 
+                        to={`/superadmin/editar-insumo/${row.id}`} 
                         className="group flex items-center gap-1.5 w-fit px-3 py-1.5 rounded-md text-sm font-medium text-restaurant-secondary bg-white border border-restaurant-secondary/30 hover:bg-restaurant-secondary hover:text-white transition-all duration-200 shadow-sm"
                     >
                         <PencilSquareIcon className="w-4 h-4" /> 
@@ -131,7 +131,7 @@ const ListarInsumos = () => {
                     <h1 className="text-3xl font-serif font-bold text-restaurant-primary">Insumos</h1>
                     <p className="text-sm text-gray-500 mt-1">Gestión de materia prima y costos</p>
                 </div>
-                <Link to="/admin/agregar-insumo" className="bg-restaurant-primary text-white px-5 py-2.5 rounded-lg font-bold flex items-center gap-2 shadow-md hover:bg-red-900 transition-colors">
+                <Link to="/superadmin/agregar-insumo" className="bg-restaurant-primary text-white px-5 py-2.5 rounded-lg font-bold flex items-center gap-2 shadow-md hover:bg-red-900 transition-colors">
                     <ArchiveBoxIcon className="w-5 h-5"/> Nuevo Insumo
                 </Link>
             </div>
