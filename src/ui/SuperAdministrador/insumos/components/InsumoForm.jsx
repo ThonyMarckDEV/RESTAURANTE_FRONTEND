@@ -13,7 +13,17 @@ const InsumoForm = ({ formData, onChange }) => {
                 nombre: formData.categoriaNombre
             });
         }
-    }, [formData.categoriaId, formData.categoriaNombre , selectedCategoryObj ]);
+    }, [formData.categoriaId, formData.categoriaNombre, selectedCategoryObj]);
+
+    const handleNameChange = (e) => {
+        const { value } = e.target;
+        
+        const soloLetrasRegex = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]*$/;
+
+        if (soloLetrasRegex.test(value)) {
+            onChange(e);
+        }
+    };
 
     const unidades = [
         { value: 'KG', label: 'KILOGRAMOS (KG)' },
@@ -62,7 +72,7 @@ const InsumoForm = ({ formData, onChange }) => {
                     </p>
                 </div>
 
-                {/* 2. Nombre */}
+                {/* 2. Nombre (CON VALIDACIÓN) */}
                 <div className="col-span-1 md:col-span-2">
                     <label className="block text-sm font-bold text-gray-700 mb-1">
                         Nombre del Insumo <span className="text-red-500">*</span>
@@ -71,11 +81,14 @@ const InsumoForm = ({ formData, onChange }) => {
                         type="text"
                         name="nombre"
                         value={formData.nombre}
-                        onChange={onChange}
+                        onChange={handleNameChange} // <--- Usamos la función con validación
                         placeholder="Ej: Papa Amarilla, Aceite Vegetal..."
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent outline-none transition-all bg-white"
                         required
                     />
+                    <p className="text-[10px] text-gray-400 mt-1">
+                        Solo se permiten letras y espacios.
+                    </p>
                 </div>
 
                 {/* 3. Código Interno */}
