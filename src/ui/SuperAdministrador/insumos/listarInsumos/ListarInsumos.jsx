@@ -52,11 +52,11 @@ const ListarInsumos = () => {
             value: filters.unidad,
             onChange: (val) => setFilters(prev => ({ ...prev, unidad: val })),
             options: [
-                { value: 'KG', label: 'Kilogramos (KG)' },
-                { value: 'LT', label: 'Litros (LT)' },
-                { value: 'UNIDAD', label: 'Unidades (UNIDAD)' },
-                { value: 'PAQUETE', label: 'Paquete' },
-                { value: 'LATA', label: 'Lata' }
+                { value: 'KG', label: 'KILOGRAMOS (KG)' },
+                { value: 'LT', label: 'LITROS (LT)' },
+                { value: 'UNIDAD', label: 'UNIDADES (UNIDAD)' },
+                { value: 'PAQUETE', label: 'PAQUETE' },
+                { value: 'LATA', label: 'LATA' }
             ]
         },
         {
@@ -66,8 +66,8 @@ const ListarInsumos = () => {
             value: filters.estado,
             onChange: (val) => setFilters(prev => ({ ...prev, estado: val })),
             options: [
-                { value: '1', label: 'Activos' },
-                { value: '0', label: 'Inactivos' }
+                { value: '1', label: 'ACTIVOS' },
+                { value: '0', label: 'INACTIVOS' }
             ]
         },
         {

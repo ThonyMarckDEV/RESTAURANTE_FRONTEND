@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { getAlmacenes, toggleAlmacenEstado } from 'services/almacenService'; 
-import LoadingScreen from 'components/Shared/LoadingScreen';
 import AlertMessage from 'components/Shared/Errors/AlertMessage';
 import ConfirmModal from 'components/Shared/Modals/ConfirmModal';
 import Table from 'components/Shared/Tables/Table';
@@ -13,12 +12,46 @@ const ListarAlmacenes = () => {
     const [alert, setAlert] = useState(null);
     const [itemToToggle, setItemToToggle] = useState(null);
     const [almacenes, setAlmacenes] = useState([]);
-    const [paginationInfo, setPaginationInfo] = useState({ currentPage: 1, totalPages: 1 });
-    const [searchTerm, setSearchTerm] = useState('');
+    
+    const [paginationInfo, setPaginationInfo] = useState({ 
+        currentPage: 1, 
+        totalPages: 1 
+    });
 
+    // Estado unificado de filtros
+    const [filters, setFilters] = useState({
+        search: '',
+        estado: ''
+    });
+
+    // --- 1. CONFIGURACIÓN DE FILTROS ---
+    const filtersList = useMemo(() => [
+        {
+            id: 'search',
+            label: 'Buscar Almacén',
+            type: 'text',
+            value: filters.search,
+            placeholder: 'Nombre del almacén...',
+            onChange: (val) => setFilters(prev => ({ ...prev, search: val }))
+        },
+        {
+            id: 'estado',
+            label: 'Estado',
+            type: 'select',
+            value: filters.estado,
+            onChange: (val) => setFilters(prev => ({ ...prev, estado: val })),
+            options: [
+                { value: '1', label: 'Activos' },
+                { value: '0', label: 'Inactivos' }
+            ]
+        }
+    ], [filters]);
+
+    // --- 2. COLUMNAS DE LA TABLA ---
     const columns = useMemo(() => [
         {
             header: 'Almacén',
+            accessor: 'nombre',
             render: (row) => (
                 <div className="flex flex-col">
                     <div className="flex items-center gap-2">
@@ -62,7 +95,7 @@ const ListarAlmacenes = () => {
                 <div className="flex justify-start gap-2">
                     <Link 
                         to={`/admin/editar-almacen/${row.id}`} 
-                        className="group flex items-center gap-1.5 w-fit px-3 py-1.5 rounded-md text-sm font-medium text-restaurant-secondary bg-white border border-restaurant-secondary/30 hover:bg-restaurant-secondary hover:text-white transition-all duration-200 shadow-sm"
+                        className="w-fit flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-restaurant-secondary bg-white border border-restaurant-secondary/30 hover:bg-restaurant-secondary hover:text-white transition-all duration-200 shadow-sm"
                     >
                         <PencilSquareIcon className="w-4 h-4" /> 
                         <span>Editar</span>
@@ -72,12 +105,17 @@ const ListarAlmacenes = () => {
         }
     ], []);
 
-    const fetchAlmacenes = useCallback(async (page, search = '') => {
+    // --- 3. LLAMADA A LA API ---
+    const fetchAlmacenes = useCallback(async (page, currentFilters) => {
         setLoading(true);
         try {
-            const response = await getAlmacenes(page, search);
+            // Pasamos search y estado
+            const response = await getAlmacenes(page, currentFilters.search, currentFilters.estado);
             setAlmacenes(response.data.content);
-            setPaginationInfo({ currentPage: response.data.currentPage, totalPages: response.data.totalPages });
+            setPaginationInfo({ 
+                currentPage: response.data.currentPage, 
+                totalPages: response.data.totalPages
+            });
         } catch (err) {
             setAlert({ type: 'error', message: 'Error al cargar los almacenes.' });
         } finally {
@@ -85,22 +123,30 @@ const ListarAlmacenes = () => {
         }
     }, []);
 
+    // Debounce para la búsqueda
     useEffect(() => {
-        const handler = setTimeout(() => fetchAlmacenes(1, searchTerm), 500);
+        const handler = setTimeout(() => {
+            fetchAlmacenes(1, filters);
+        }, 500);
         return () => clearTimeout(handler);
-    }, [searchTerm, fetchAlmacenes]);
+    }, [filters, fetchAlmacenes]);
 
+    // --- 4. MANEJO DE ESTADO (TOGGLE) ---
     const handleToggle = async () => {
         const id = itemToToggle.id;
         setItemToToggle(null);
         try {
             await toggleAlmacenEstado(id);
-            fetchAlmacenes(paginationInfo.currentPage, searchTerm);
-            setAlert({ type: 'success', message: 'Estado del almacén actualizado.' });
-        } catch (err) { setAlert({ type: 'error', message: 'Error al cambiar estado.' }); }
+            fetchAlmacenes(paginationInfo.currentPage, filters);
+            setAlert({ type: 'success', message: 'Estado actualizado correctamente.' });
+        } catch (err) { 
+            setAlert({ type: 'error', message: 'Error al cambiar estado.' }); 
+        }
     };
 
-    if (loading && almacenes.length === 0) return <LoadingScreen />;
+    const clearFilters = () => {
+        setFilters({ search: '', estado: '' });
+    };
 
     return (
         <div className="container mx-auto p-6 min-h-screen">
@@ -125,9 +171,16 @@ const ListarAlmacenes = () => {
             )}
 
             <Table 
-                columns={columns} data={almacenes} loading={loading}
-                pagination={{ currentPage: paginationInfo.currentPage, totalPages: paginationInfo.totalPages, onPageChange: (page) => fetchAlmacenes(page, searchTerm) }}
-                onSearch={setSearchTerm} searchPlaceholder="Buscar almacén por nombre..."
+                columns={columns} 
+                data={almacenes} 
+                loading={loading}
+                filters={filtersList} 
+                onClearFilters={clearFilters}
+                pagination={{ 
+                    currentPage: paginationInfo.currentPage, 
+                    totalPages: paginationInfo.totalPages, 
+                    onPageChange: (page) => fetchAlmacenes(page, filters) 
+                }}
             />
         </div>
     );

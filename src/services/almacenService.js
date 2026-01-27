@@ -5,12 +5,17 @@ import { handleResponse } from 'utilities/Responses/handleResponse';
 const BASE_URL = `${API_BASE_URL}/api/almacenes`;
 
 // Listar paginado
-export const getAlmacenes = async (pageNumber = 1, search = '') => {
+export const getAlmacenes = async (pageNumber = 1, search = '', estado = '') => {
   const params = new URLSearchParams({
     page: pageNumber - 1,
     size: 8,
   });
+
   if (search.trim()) params.append('search', search);
+  
+  if (estado !== '') {
+    params.append('estado', estado === '1' ? 'true' : 'false');
+  }
 
   const response = await fetchWithAuth(`${BASE_URL}?${params.toString()}`, { 
     method: 'GET', 
