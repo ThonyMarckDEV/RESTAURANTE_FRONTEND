@@ -4,21 +4,34 @@ import { handleResponse } from 'utilities/Responses/handleResponse';
 
 const BASE_URL = `${API_BASE_URL}/api/categorias`;
 
-export const getCategorias = async (pageNumber = 1, search = '', type = null) => {
+export const getCategorias = async (pageNumber = 1, search = '', type = '', status = '') => {
   const params = new URLSearchParams({
     page: pageNumber - 1,
-    size: 10,
+    size: 8,
   });
   
-  if (search.trim()) params.append('search', search);
+  // Filtro por búsqueda de texto
+  if (search && search.trim()) {
+    params.append('search', search);
+  }
   
-  // Si enviamos un tipo, lo agregamos a la URL
-  if (type !== null) params.append('type', type);
+  // Filtro por Tipo (1, 2, 3, 4)
+  if (type !== null && type !== undefined && type !== '') {
+    params.append('type', type);
+  }
+
+  // Filtro por Estado (0 o 1)
+  if (status !== null && status !== undefined && status !== '') {
+    params.append('status', status);
+  }
 
   const response = await fetchWithAuth(`${BASE_URL}?${params.toString()}`, { 
     method: 'GET', 
-    headers: { 'Accept': 'application/json' } 
+    headers: { 
+      'Accept': 'application/json' 
+    } 
   });
+
   return handleResponse(response);
 };
 

@@ -41,23 +41,13 @@ const ListarInsumos = () => {
                 </div>
             )
         },
-        // --- CAMBIO: COLUMNA 1 (SOLO UNIDAD) ---
         {
-            header: 'Unidad',
+            header: 'Stock Mín / Unidad',
             render: (row) => (
-                <span className="text-xs font-bold text-gray-600 bg-gray-100 px-2 py-1 rounded border border-gray-200">
-                    {row.unidad_medida}
-                </span>
-            )
-        },
-        // --- CAMBIO: COLUMNA 2 (STOCK MIN CONCATENADO) ---
-        {
-            header: 'Stock Mín.',
-            render: (row) => (
-                <span className="font-bold text-gray-700">
-                    {/* parseFloat quita los decimales .00 innecesarios */}
-                    {parseFloat(row.stock_minimo)} <span className="text-xs font-normal text-gray-500">{row.unidad_medida}</span>
-                </span>
+                <div className="text-sm">
+                    <span className="font-bold text-gray-700">{row.stock_minimo}</span>
+                    <span className="ml-1 text-gray-500 text-xs">{row.unidad_medida}</span>
+                </div>
             )
         },
         {
@@ -86,7 +76,7 @@ const ListarInsumos = () => {
             render: (row) => (
                 <div className="flex justify-start gap-2">
                     <Link 
-                        to={`/superadmin/editar-insumo/${row.id}`} 
+                        to={`/admin/editar-insumo/${row.id}`} 
                         className="group flex items-center gap-1.5 w-fit px-3 py-1.5 rounded-md text-sm font-medium text-restaurant-secondary bg-white border border-restaurant-secondary/30 hover:bg-restaurant-secondary hover:text-white transition-all duration-200 shadow-sm"
                     >
                         <PencilSquareIcon className="w-4 h-4" /> 
@@ -134,7 +124,7 @@ const ListarInsumos = () => {
                     <h1 className="text-3xl font-serif font-bold text-restaurant-primary">Insumos</h1>
                     <p className="text-sm text-gray-500 mt-1">Gestión de materia prima y costos</p>
                 </div>
-                <Link to="/superadmin/agregar-insumo" className="bg-restaurant-primary text-white px-5 py-2.5 rounded-lg font-bold flex items-center gap-2 shadow-md hover:bg-red-900 transition-colors">
+                <Link to="/admin/agregar-insumo" className="bg-restaurant-primary text-white px-5 py-2.5 rounded-lg font-bold flex items-center gap-2 shadow-md hover:bg-red-900 transition-colors">
                     <ArchiveBoxIcon className="w-5 h-5"/> Nuevo Insumo
                 </Link>
             </div>

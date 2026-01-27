@@ -12,20 +12,16 @@ export const createSede = async (data) => {
   return handleResponse(response);
 };
 
-export const getSedes = async (pageNumber = 1, search = '') => {
+export const getSedes = async (pageNumber = 1, search = '', status = '') => {
   const params = new URLSearchParams({
     page: pageNumber - 1,
-    size: 10,
+    size: 8,
   });
 
-  // Solo agregamos el search si realmente tiene contenido
-  if (search.trim()) {
-    params.append('search', search);
-  }
+  if (search.trim()) params.append('search', search);
+  if (status !== null && status !== '') params.append('status', status);
 
-  const url = `${API_BASE_URL}/api/sedes?${params.toString()}`;
-
-  const response = await fetchWithAuth(url, { 
+  const response = await fetchWithAuth(`${API_BASE_URL}/api/sedes?${params.toString()}`, { 
     method: 'GET', 
     headers: { 'Accept': 'application/json' } 
   });

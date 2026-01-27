@@ -4,12 +4,14 @@ import { handleResponse } from 'utilities/Responses/handleResponse';
 
 const BASE_URL = `${API_BASE_URL}/api/proveedores`;
 
-export const getProveedores = async (pageNumber = 1, search = '') => {
+export const getProveedores = async (pageNumber = 1, search = '', status = '') => {
   const params = new URLSearchParams({
     page: pageNumber - 1,
-    size: 10,
+    size: 8,
   });
+
   if (search.trim()) params.append('search', search);
+  if (status !== null && status !== '') params.append('status', status);
 
   const response = await fetchWithAuth(`${BASE_URL}?${params.toString()}`, { 
     method: 'GET', 

@@ -13,9 +13,13 @@ const ListarCategorias = () => {
     const [catToToggle, setCatToToggle] = useState(null);
     const [categorias, setCategorias] = useState([]);
     const [paginationInfo, setPaginationInfo] = useState({ currentPage: 1, totalPages: 1 });
+    
+    // --- ESTADOS PARA FILTROS ---
     const [searchTerm, setSearchTerm] = useState('');
+    const [typeFilter, setTypeFilter] = useState(''); 
+    const [statusFilter, setStatusFilter] = useState('');
 
-    // Helper para formatear el tipo
+    // Formateador de etiquetas de tipo
     const getTipoLabel = (tipo) => {
         switch(tipo) {
             case 1: return <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs font-bold">INSUMO</span>;
@@ -26,6 +30,7 @@ const ListarCategorias = () => {
         }
     };
 
+    // Definición de columnas
     const columns = useMemo(() => [
         {
             header: 'Categoría',
@@ -38,17 +43,16 @@ const ListarCategorias = () => {
                 </div>
             )
         },
-        {
-            header: 'Tipo',
-            render: (row) => getTipoLabel(row.tipo_categoria)
-        },
+        { header: 'Tipo', render: (row) => getTipoLabel(row.tipo_categoria) },
         {
             header: 'Estado',
             render: (row) => (
                 <button 
                     onClick={() => setCatToToggle(row)}
-                    className={`px-3 py-1 font-bold text-xs rounded-full border ${
-                        row.estado === 1 ? 'text-emerald-700 bg-emerald-100 border-emerald-200' : 'text-red-700 bg-red-50 border-red-100'
+                    className={`px-3 py-1 font-bold text-xs rounded-full border transition-colors ${
+                        row.estado === 1 
+                        ? 'text-emerald-700 bg-emerald-100 border-emerald-200 hover:bg-emerald-200' 
+                        : 'text-red-700 bg-red-50 border-red-100 hover:bg-red-100'
                     }`}
                 >
                     {row.estado === 1 ? 'ACTIVO' : 'INACTIVO'}
@@ -71,50 +75,128 @@ const ListarCategorias = () => {
         }
     ], []);
 
-    const fetchCategorias = useCallback(async (page, search = '') => {
+    // Función de carga de datos
+    const fetchCategorias = useCallback(async (page, search = '', type = '', status = '') => {
         setLoading(true);
         try {
-            const response = await getCategorias(page, search);
+            const response = await getCategorias(page, search, type, status);
             setCategorias(response.data.content);
-            setPaginationInfo({ currentPage: response.data.currentPage, totalPages: response.data.totalPages });
+            setPaginationInfo({ 
+                currentPage: response.data.currentPage, 
+                totalPages: response.data.totalPages 
+            });
         } catch (err) {
-            setAlert({ type: 'error', message: 'Error al cargar datos.' });
+            setAlert({ type: 'error', message: 'Error al cargar las categorías.' });
         } finally {
             setLoading(false);
         }
     }, []);
 
+    // Efecto para búsqueda y filtros con Debounce
     useEffect(() => {
-        const handler = setTimeout(() => fetchCategorias(1, searchTerm), 500);
+        const handler = setTimeout(() => {
+            fetchCategorias(1, searchTerm, typeFilter, statusFilter);
+        }, 500);
         return () => clearTimeout(handler);
-    }, [searchTerm, fetchCategorias]);
+    }, [searchTerm, typeFilter, statusFilter, fetchCategorias]);
 
+    // Manejo de cambio de estado
     const handleToggle = async () => {
+        if (!catToToggle) return;
         const id = catToToggle.id;
         setCatToToggle(null);
         try {
             await toggleCategoriaEstado(id);
-            fetchCategorias(paginationInfo.currentPage, searchTerm);
-            setAlert({ type: 'success', message: 'Estado actualizado.' });
-        } catch (err) { setAlert({ type: 'error', message: 'Error al cambiar estado.' }); }
+            fetchCategorias(paginationInfo.currentPage, searchTerm, typeFilter, statusFilter);
+            setAlert({ type: 'success', message: 'Estado actualizado correctamente.' });
+        } catch (err) { 
+            setAlert({ type: 'error', message: 'Error al cambiar el estado.' }); 
+        }
     };
+
+    const clearFilters = () => {
+        setSearchTerm('');
+        setTypeFilter('');
+        setStatusFilter('');
+    };
+
+    // --- CONFIGURACIÓN DE FILTROS PARA LA TABLA GENÉRICA ---
+    const filterConfig = [
+        {
+            id: 'search',
+            label: 'Buscar por nombre',
+            type: 'text',
+            placeholder: 'Ej: Bebidas, Carnes...',
+            value: searchTerm,
+            onChange: setSearchTerm
+        },
+        {
+            id: 'type',
+            label: 'Filtrar Tipo',
+            type: 'select',
+            value: typeFilter,
+            onChange: setTypeFilter,
+            emptyLabel: 'Todos los tipos',
+            options: [
+                { value: '1', label: 'INSUMO' },
+                { value: '2', label: 'PRODUCTO' },
+                { value: '3', label: 'PLATO' },
+                { value: '4', label: 'MIXTO' },
+            ]
+        },
+        {
+            id: 'status',
+            label: 'Filtrar Estado',
+            type: 'select',
+            value: statusFilter,
+            onChange: setStatusFilter,
+            emptyLabel: 'Todos los estados',
+            options: [
+                { value: '1', label: 'ACTIVOS' },
+                { value: '0', label: 'INACTIVOS' },
+            ]
+        }
+    ];
 
     if (loading && categorias.length === 0) return <LoadingScreen />;
 
     return (
         <div className="container mx-auto p-6 min-h-screen">
             <div className="flex justify-between items-center mb-8">
-                <h1 className="text-3xl font-serif font-bold text-restaurant-primary">Categorías</h1>
-                <Link to="/superadmin/agregar-categoria" className="bg-restaurant-primary text-white px-5 py-2.5 rounded-lg font-bold flex items-center gap-2">
+                <div>
+                    <h1 className="text-3xl font-serif font-bold text-restaurant-primary">Categorías</h1>
+                    <p className="text-gray-500 text-sm mt-1">Gestiona los tipos y estados de tus categorías de productos.</p>
+                </div>
+                <Link to="/superadmin/agregar-categoria" className="bg-restaurant-primary text-white px-5 py-2.5 rounded-lg font-bold flex items-center gap-2 shadow-md hover:bg-opacity-90 transition transform hover:-translate-y-0.5 active:translate-y-0">
                     <TagIcon className="w-5 h-5"/> Nueva Categoría
                 </Link>
             </div>
-            <AlertMessage type={alert?.type} message={alert?.message} onClose={() => setAlert(null)} />
-            {catToToggle && <ConfirmModal message={`¿Cambiar estado de ${catToToggle.nombre}?`} onConfirm={handleToggle} onCancel={() => setCatToToggle(null)} />}
+
+            <AlertMessage 
+                type={alert?.type} 
+                message={alert?.message} 
+                onClose={() => setAlert(null)} 
+            />
+            
+            {catToToggle && (
+                <ConfirmModal 
+                    message={`¿Estás seguro de cambiar el estado de "${catToToggle.nombre}"?`} 
+                    onConfirm={handleToggle} 
+                    onCancel={() => setCatToToggle(null)} 
+                />
+            )}
+
             <Table 
-                columns={columns} data={categorias} loading={loading}
-                pagination={{ currentPage: paginationInfo.currentPage, totalPages: paginationInfo.totalPages, onPageChange: (page) => fetchCategorias(page, searchTerm) }}
-                onSearch={setSearchTerm} searchPlaceholder="Buscar categoría..."
+                columns={columns} 
+                data={categorias} 
+                loading={loading}
+                filters={filterConfig}
+                onClearFilters={clearFilters}
+                pagination={{ 
+                    currentPage: paginationInfo.currentPage, 
+                    totalPages: paginationInfo.totalPages, 
+                    onPageChange: (page) => fetchCategorias(page, searchTerm, typeFilter, statusFilter) 
+                }}
             />
         </div>
     );

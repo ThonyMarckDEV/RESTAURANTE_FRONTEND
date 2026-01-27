@@ -13,7 +13,10 @@ const ListarProveedores = () => {
     const [provToToggle, setProvToToggle] = useState(null);
     const [proveedores, setProveedores] = useState([]);
     const [paginationInfo, setPaginationInfo] = useState({ currentPage: 1, totalPages: 1 });
+    
+    // --- ESTADOS PARA FILTROS ---
     const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('');
 
     const columns = useMemo(() => [
         {
@@ -32,7 +35,7 @@ const ListarProveedores = () => {
             render: (row) => (
                 <div className="flex items-center gap-2 text-gray-600">
                     <IdentificationIcon className="w-4 h-4 text-gray-400" />
-                    <span className="font-mono bg-gray-100 px-2 py-0.5 rounded border border-gray-200 text-xs">
+                    <span className="font-mono bg-gray-100 px-2 py-0.5 rounded border border-gray-200 text-xs font-bold">
                         {row.ruc}
                     </span>
                 </div>
@@ -65,51 +68,76 @@ const ListarProveedores = () => {
         {
             header: 'Acciones',
             render: (row) => (
-                <div className="flex justify-start">
-                    <Link 
-                        to={`/superadmin/editar-proveedor/${row.id}`} 
-                        className="group flex items-center gap-1.5 w-fit px-3 py-1.5 rounded-md text-sm font-medium text-restaurant-secondary bg-white border border-restaurant-secondary/30 hover:bg-restaurant-secondary hover:text-white transition-all duration-200 shadow-sm"
-                    >
-                        <PencilSquareIcon className="w-4 h-4" /> 
-                        <span>Editar</span>
-                    </Link>
-                </div>
+                <Link 
+                    to={`/superadmin/editar-proveedor/${row.id}`} 
+                    className="group flex items-center gap-1.5 w-fit px-3 py-1.5 rounded-md text-sm font-medium text-restaurant-secondary bg-white border border-restaurant-secondary/30 hover:bg-restaurant-secondary hover:text-white transition-all duration-200 shadow-sm"
+                >
+                    <PencilSquareIcon className="w-4 h-4" /> 
+                    <span>Editar</span>
+                </Link>
             )
         }
     ], []);
 
-    const fetchProveedores = useCallback(async (page, search = '') => {
+    const fetchProveedores = useCallback(async (page, search = '', status = '') => {
         setLoading(true);
         try {
-            const response = await getProveedores(page, search);
+            const response = await getProveedores(page, search, status);
             const { content, currentPage, totalPages } = response.data;
             setProveedores(content);
             setPaginationInfo({ currentPage, totalPages });
         } catch (err) {
-            setAlert({ type: 'error', message: 'Error al cargar la lista de proveedores.' });
+            setAlert({ type: 'error', message: 'Error al cargar proveedores.' });
         } finally {
             setLoading(false);
         }
     }, []);
 
     useEffect(() => {
-        const handler = setTimeout(() => fetchProveedores(1, searchTerm), 500);
+        const handler = setTimeout(() => fetchProveedores(1, searchTerm, statusFilter), 500);
         return () => clearTimeout(handler);
-    }, [searchTerm, fetchProveedores]);
+    }, [searchTerm, statusFilter, fetchProveedores]);
 
     const handleToggleStatus = async () => {
         const id = provToToggle.id;
         setProvToToggle(null);
-        setLoading(true);
         try {
             await toggleProveedorEstado(id);
-            setAlert({ type: 'success', message: 'Estado del proveedor actualizado.' });
-            await fetchProveedores(paginationInfo.currentPage, searchTerm);
+            setAlert({ type: 'success', message: 'Estado actualizado correctamente.' });
+            fetchProveedores(paginationInfo.currentPage, searchTerm, statusFilter);
         } catch (err) {
-            setAlert({ type: 'error', message: 'No se pudo cambiar el estado.' });
-            setLoading(false);
+            setAlert({ type: 'error', message: 'Error al cambiar estado.' });
         }
     };
+
+    const clearFilters = () => {
+        setSearchTerm('');
+        setStatusFilter('');
+    };
+
+    // --- CONFIGURACIÓN DE FILTROS ---
+    const filterConfig = [
+        {
+            id: 'search',
+            label: 'Proveedor / RUC',
+            type: 'text',
+            placeholder: 'Razón social o RUC...',
+            value: searchTerm,
+            onChange: setSearchTerm
+        },
+        {
+            id: 'status',
+            label: 'Estado',
+            type: 'select',
+            value: statusFilter,
+            onChange: setStatusFilter,
+            emptyLabel: 'Todos los estados',
+            options: [
+                { value: '1', label: 'ACTIVOS' },
+                { value: '0', label: 'INACTIVOS' },
+            ]
+        }
+    ];
 
     if (loading && proveedores.length === 0) return <LoadingScreen />;
 
@@ -118,11 +146,11 @@ const ListarProveedores = () => {
             <div className="flex justify-between items-center mb-8">
                 <div>
                     <h1 className="text-3xl font-serif font-bold text-restaurant-primary">Directorio de Proveedores</h1>
-                    <p className="text-sm text-gray-500 mt-1">Gestiona las empresas que suministran a tu restaurante</p>
+                    <p className="text-sm text-gray-500 mt-1">Administra tus proveedores y contactos comerciales.</p>
                 </div>
                 <Link 
                     to="/superadmin/agregar-proveedor" 
-                    className="bg-restaurant-primary text-white px-5 py-2.5 rounded-lg font-bold flex items-center gap-2 shadow-md hover:bg-red-900 transition-all transform hover:-translate-y-0.5"
+                    className="bg-restaurant-primary text-white px-5 py-2.5 rounded-lg font-bold flex items-center gap-2 shadow-md hover:bg-opacity-90 transition transform hover:-translate-y-0.5"
                 >
                     <UserGroupIcon className="w-5 h-5"/> Nuevo Proveedor
                 </Link>
@@ -138,20 +166,18 @@ const ListarProveedores = () => {
                 />
             )}
 
-            <div className="overflow-hidden rounded-xl borde">
-                <Table 
-                    columns={columns} 
-                    data={proveedores} 
-                    loading={loading}
-                    pagination={{ 
-                        currentPage: paginationInfo.currentPage, 
-                        totalPages: paginationInfo.totalPages, 
-                        onPageChange: (page) => fetchProveedores(page, searchTerm) 
-                    }}
-                    onSearch={setSearchTerm} 
-                    searchPlaceholder="Buscar por Razón Social o RUC..."
-                />
-            </div>
+            <Table 
+                columns={columns} 
+                data={proveedores} 
+                loading={loading}
+                filters={filterConfig}
+                onClearFilters={clearFilters}
+                pagination={{ 
+                    currentPage: paginationInfo.currentPage, 
+                    totalPages: paginationInfo.totalPages, 
+                    onPageChange: (page) => fetchProveedores(page, searchTerm, statusFilter) 
+                }}
+            />
         </div>
     );
 };
