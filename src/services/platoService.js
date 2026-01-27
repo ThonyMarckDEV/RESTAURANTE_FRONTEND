@@ -5,12 +5,18 @@ import { handleResponse } from 'utilities/Responses/handleResponse';
 const BASE_URL = `${API_BASE_URL}/api/platos`;
 
 // Listar paginado
-export const getPlatos = async (pageNumber = 1, search = '') => {
+export const getPlatos = async (pageNumber = 1, filters = {}) => {
   const params = new URLSearchParams({
     page: pageNumber - 1,
     size: 6,
   });
-  if (search.trim()) params.append('search', search);
+
+  // Filtros dinámicos
+  if (filters.search) params.append('search', filters.search);
+  if (filters.categoriaId) params.append('categoriaId', filters.categoriaId);
+  if (filters.minPrecio) params.append('minPrecio', filters.minPrecio);
+  if (filters.maxPrecio) params.append('maxPrecio', filters.maxPrecio);
+  if (filters.estado !== '' && filters.estado !== undefined) params.append('estado', filters.estado);
 
   const response = await fetchWithAuth(`${BASE_URL}?${params.toString()}`, { 
     method: 'GET', 

@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { getPlatos, togglePlatoEstado } from 'services/platoService'; 
-import LoadingScreen from 'components/Shared/LoadingScreen';
 import AlertMessage from 'components/Shared/Errors/AlertMessage';
 import ConfirmModal from 'components/Shared/Modals/ConfirmModal';
 import Table from 'components/Shared/Tables/Table';
+import CategoriaSearchSelect from 'components/Shared/Comboboxes/CategoriaSearchSelect';
 import { PencilSquareIcon, FireIcon, TagIcon } from '@heroicons/react/24/outline';
 
 const ListarPlatos = () => {
@@ -12,12 +12,78 @@ const ListarPlatos = () => {
     const [alert, setAlert] = useState(null);
     const [itemToToggle, setItemToToggle] = useState(null);
     const [platos, setPlatos] = useState([]);
-    const [paginationInfo, setPaginationInfo] = useState({ currentPage: 1, totalPages: 1 });
-    const [searchTerm, setSearchTerm] = useState('');
+    
+    // --- ESTADO PARA CONTROLAR EL OBJETO DEL COMBOBOX ---
+    const [selectedCategoryObj, setSelectedCategoryObj] = useState(null);
 
+    const [paginationInfo, setPaginationInfo] = useState({ currentPage: 1, totalPages: 1 });
+
+    const [filters, setFilters] = useState({
+        search: '',
+        estado: '',
+        categoriaId: '', 
+        minPrecio: '',
+        maxPrecio: ''
+    });
+
+    // --- CONFIGURACIÓN DE FILTROS ---
+    const filtersList = useMemo(() => [
+        {
+            id: 'search',
+            label: 'Nombre',
+            type: 'text',
+            value: filters.search,
+            placeholder: 'Buscar plato...',
+            onChange: (val) => setFilters(prev => ({ ...prev, search: val }))
+        },
+        {
+            id: 'categoriaId',
+            label: 'Categoría',
+            component: (
+                <CategoriaSearchSelect 
+                    categoryTypes={[3]} // 3 = PLATOS / COCINA
+                    initialValue={selectedCategoryObj}
+                    onSelect={(cat) => {
+                        setSelectedCategoryObj(cat);
+                        setFilters(prev => ({ ...prev, categoriaId: cat ? cat.id : '' }));
+                    }}
+                />
+            )
+        },
+        {
+            id: 'estado',
+            label: 'Estado',
+            type: 'select',
+            value: filters.estado,
+            onChange: (val) => setFilters(prev => ({ ...prev, estado: val })),
+            options: [
+                { value: '1', label: 'ACTIVOS' },
+                { value: '0', label: 'INACTIVOS' }
+            ]
+        },
+        {
+            id: 'minPrecio',
+            label: 'Min Precio',
+            type: 'text',
+            value: filters.minPrecio,
+            placeholder: '0.00',
+            onChange: (val) => setFilters(prev => ({ ...prev, minPrecio: val }))
+        },
+        {
+            id: 'maxPrecio',
+            label: 'Max Precio',
+            type: 'text',
+            value: filters.maxPrecio,
+            placeholder: '0.00',
+            onChange: (val) => setFilters(prev => ({ ...prev, maxPrecio: val }))
+        }
+    ], [filters, selectedCategoryObj]);
+
+    // --- COLUMNAS ---
     const columns = useMemo(() => [
         {
             header: 'Plato',
+            accessor: 'nombre',
             render: (row) => (
                 <div className="flex flex-col">
                     <div className="flex items-center gap-2">
@@ -65,23 +131,21 @@ const ListarPlatos = () => {
         {
             header: 'Acciones',
             render: (row) => (
-                <div className="flex justify-start gap-2">
-                    <Link 
-                        to={`/admin/editar-plato/${row.id}`} 
-                        className="group flex items-center gap-1.5 w-fit px-3 py-1.5 rounded-md text-sm font-medium text-restaurant-secondary bg-white border border-restaurant-secondary/30 hover:bg-restaurant-secondary hover:text-white transition-all duration-200 shadow-sm"
-                    >
-                        <PencilSquareIcon className="w-4 h-4" /> 
-                        <span>Editar</span>
-                    </Link>
-                </div>
+                <Link 
+                    to={`/admin/editar-plato/${row.id}`} 
+                    className="w-fit flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-restaurant-secondary bg-white border border-restaurant-secondary/30 hover:bg-restaurant-secondary hover:text-white transition-all shadow-sm"
+                >
+                    <PencilSquareIcon className="w-4 h-4" /> Editar
+                </Link>
             )
         }
     ], []);
 
-    const fetchPlatos = useCallback(async (page, search = '') => {
+    // --- FETCH DATA ---
+    const fetchPlatos = useCallback(async (page, currentFilters) => {
         setLoading(true);
         try {
-            const response = await getPlatos(page, search);
+            const response = await getPlatos(page, currentFilters);
             setPlatos(response.data.content);
             setPaginationInfo({ currentPage: response.data.currentPage, totalPages: response.data.totalPages });
         } catch (err) {
@@ -92,21 +156,32 @@ const ListarPlatos = () => {
     }, []);
 
     useEffect(() => {
-        const handler = setTimeout(() => fetchPlatos(1, searchTerm), 500);
+        const handler = setTimeout(() => {
+            fetchPlatos(1, filters);
+        }, 500);
         return () => clearTimeout(handler);
-    }, [searchTerm, fetchPlatos]);
+    }, [filters, fetchPlatos]);
+
+    const clearFilters = () => {
+        setFilters({
+            search: '',
+            estado: '',
+            categoriaId: '',
+            minPrecio: '',
+            maxPrecio: ''
+        });
+        setSelectedCategoryObj(null); // Limpiar combobox
+    };
 
     const handleToggle = async () => {
         const id = itemToToggle.id;
         setItemToToggle(null);
         try {
             await togglePlatoEstado(id);
-            fetchPlatos(paginationInfo.currentPage, searchTerm);
+            fetchPlatos(paginationInfo.currentPage, filters);
             setAlert({ type: 'success', message: 'Estado del plato actualizado.' });
         } catch (err) { setAlert({ type: 'error', message: 'Error al cambiar estado.' }); }
     };
-
-    if (loading && platos.length === 0) return <LoadingScreen />;
 
     return (
         <div className="container mx-auto p-6 min-h-screen">
@@ -131,9 +206,16 @@ const ListarPlatos = () => {
             )}
 
             <Table 
-                columns={columns} data={platos} loading={loading}
-                pagination={{ currentPage: paginationInfo.currentPage, totalPages: paginationInfo.totalPages, onPageChange: (page) => fetchPlatos(page, searchTerm) }}
-                onSearch={setSearchTerm} searchPlaceholder="Buscar plato..."
+                columns={columns} 
+                data={platos} 
+                loading={loading}
+                filters={filtersList} // Filtros avanzados
+                onClearFilters={clearFilters}
+                pagination={{ 
+                    currentPage: paginationInfo.currentPage, 
+                    totalPages: paginationInfo.totalPages, 
+                    onPageChange: (page) => fetchPlatos(page, filters) 
+                }}
             />
         </div>
     );
