@@ -41,7 +41,9 @@ const ListarInsumos = () => {
             options: [
                 { value: 'KG', label: 'Kilogramos (KG)' },
                 { value: 'LT', label: 'Litros (LT)' },
-                { value: 'UNIDAD', label: 'Unidades (UNIDAD)' }
+                { value: 'UNIDAD', label: 'Unidades (UNIDAD)' },
+                { value: 'PAQUETE', label: 'Paquete' },
+                { value: 'LATA', label: 'Lata' }
             ]
         },
         {
