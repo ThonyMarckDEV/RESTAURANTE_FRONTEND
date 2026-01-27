@@ -53,7 +53,10 @@ import Home from 'ui/home/Home';
   import AgregarPlato from 'ui/Administrador/platos/agregarPlato/AgregarPlato';
   import ListarPlatos from 'ui/Administrador/platos/listarPlatos/ListarPlatos';
   import EditarPlato from 'ui/Administrador/platos/editarPlato/EditarPlato';
-
+  //RUTAS CAJEROS
+  import AgregarCajero from 'ui/Administrador/cajeros/agregarCajero/AgregarCajero';
+  import ListarCajeros from 'ui/Administrador/cajeros/listarCajeros/ListarCajeros';
+  import EditarCajero from 'ui/Administrador/cajeros/editarCajero/EditarCajero';
 
 // Utilities
 import ProtectedRouteHome from 'utilities/ProtectedRoutes/ProtectedRouteHome';
@@ -163,6 +166,14 @@ function AppContent() {
           <Route path="listar-platos" element={<ListarPlatos />} />
           {/* Ruta Editar Plato */}
           <Route path="editar-plato/:id" element={<EditarPlato />} />
+
+        {/* RUTAS CAJEROS */}
+          {/* Ruta Agregar Cajero */}
+          <Route path="agregar-cajero" element={<AgregarCajero />} />
+          {/* Ruta Listar Cajeros */}
+          <Route path="listar-cajeros" element={<ListarCajeros />} />
+          {/* Ruta Editar Cajero */}
+          <Route path="editar-cajero/:id" element={<EditarCajero />} />
 
 
       </Route>
