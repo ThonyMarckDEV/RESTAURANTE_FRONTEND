@@ -1,4 +1,5 @@
 import React from 'react';
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 
 const DOTS = '...';
 
@@ -43,11 +44,16 @@ const getPaginationRange = ({ totalPages, currentPage, siblingCount = 1 }) => {
   return range(1, totalPages);
 };
 
-const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+const Pagination = ({ 
+    currentPage, 
+    totalPages, 
+    onPageChange, 
+}) => {
   const paginationRange = getPaginationRange({ currentPage, totalPages });
 
-  // Si no hay páginas o solo hay una, no renderizamos nada
-  if (totalPages <= 1) return null;
+  if (currentPage === 0 || totalPages < 1) {
+    return null;
+  }
 
   const handlePrevious = () => {
     if (currentPage > 1) onPageChange(currentPage - 1);
@@ -58,50 +64,56 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   };
 
   return (
-    <nav className="flex justify-center items-center space-x-1 mt-8 select-none">
-      {/* Botón Anterior */}
-      <button
-        onClick={handlePrevious}
-        disabled={currentPage === 1}
-        className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-l-md hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
-      >
-        Anterior
-      </button>
+    <div className="flex flex-col md:flex-row justify-between items-center w-full px-2 py-3 select-none">
+        
+      {/* SECCIÓN IZQUIERDA: INFORMACIÓN */}
+      <div className="text-sm text-gray-500 font-medium mb-4 md:mb-0">
+        <span className="text-gray-900 font-semibold">Página {currentPage}</span> de {totalPages}
+      </div>
 
-      {/* Números de Página */}
-      {paginationRange.map((pageNumber, index) => {
-        if (pageNumber === DOTS) {
+      {/* SECCIÓN DERECHA: BOTONES */}
+      <nav className="flex items-center gap-1">
+        <button
+          onClick={handlePrevious}
+          disabled={currentPage === 1}
+          className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-200 text-gray-500 bg-white hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+        >
+          <ChevronLeftIcon className="w-4 h-4" />
+        </button>
+
+        {paginationRange.map((pageNumber, index) => {
+          if (pageNumber === DOTS) {
+            return (
+              <span key={`dots-${index}`} className="w-8 h-8 flex items-center justify-center text-gray-400 text-xs">
+                &#8230;
+              </span>
+            );
+          }
+
           return (
-            <span key={`dots-${index}`} className="px-3 py-2 text-gray-500">
-              &#8230;
-            </span>
+            <button
+              key={pageNumber}
+              onClick={() => onPageChange(pageNumber)}
+              className={`w-8 h-8 flex items-center justify-center rounded-md text-xs font-semibold transition-all border ${
+                currentPage === pageNumber
+                  ? 'bg-gray-900 text-white border-gray-900 shadow-sm'
+                  : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+              }`}
+            >
+              {pageNumber}
+            </button>
           );
-        }
+        })}
 
-        return (
-          <button
-            key={pageNumber}
-            onClick={() => onPageChange(pageNumber)}
-            className={`px-4 py-2 text-sm font-semibold border transition-all ${
-              currentPage === pageNumber
-                ? 'bg-red-700 text-white border-red-700 z-10 shadow-sm'
-                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
-            }`}
-          >
-            {pageNumber}
-          </button>
-        );
-      })}
-
-      {/* Botón Siguiente */}
-      <button
-        onClick={handleNext}
-        disabled={currentPage === totalPages}
-        className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-r-md hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
-      >
-        Siguiente
-      </button>
-    </nav>
+        <button
+          onClick={handleNext}
+          disabled={currentPage === totalPages}
+          className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-200 text-gray-500 bg-white hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+        >
+          <ChevronRightIcon className="w-4 h-4" />
+        </button>
+      </nav>
+    </div>
   );
 };
 

@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { getInsumos, toggleInsumoEstado } from 'services/insumoService'; 
 import AlertMessage from 'components/Shared/Errors/AlertMessage';
 import ConfirmModal from 'components/Shared/Modals/ConfirmModal';
-import Table from 'components/Shared/Tables/Table'; // Tu componente Table
+import Table from 'components/Shared/Tables/Table'; 
+import CategoriaSearchSelect from 'components/Shared/Comboboxes/CategoriaSearchSelect';
 import { PencilSquareIcon, ArchiveBoxIcon, TagIcon, QrCodeIcon } from '@heroicons/react/24/outline';
 
 const ListarInsumos = () => {
@@ -13,16 +14,16 @@ const ListarInsumos = () => {
     const [insumos, setInsumos] = useState([]);
     const [paginationInfo, setPaginationInfo] = useState({ currentPage: 1, totalPages: 1 });
 
-    // --- ESTADOS ---
     const [filters, setFilters] = useState({
         search: '',
         unidad: '',
         estado: '',
+        categoriaId: '', 
         minPrecio: '',
         maxPrecio: ''
     });
 
-    // --- CONFIGURACIÓN DE FILTROS PARA LA TABLA ---
+    // --- CONFIGURACIÓN DE FILTROS ---
     const filtersList = useMemo(() => [
         {
             id: 'search',
@@ -31,6 +32,18 @@ const ListarInsumos = () => {
             value: filters.search,
             placeholder: 'Buscar insumo...',
             onChange: (val) => setFilters(prev => ({ ...prev, search: val }))
+        },
+        {
+            id: 'categoria',
+            label: 'Categoría',
+            type: 'custom',
+            render: (
+                <CategoriaSearchSelect 
+                    onSelect={(cat) => setFilters(prev => ({ ...prev, categoriaId: cat.id }))}
+                    clearTrigger={filters.categoriaId === ''}
+                    currentValue={filters.categoriaId ? "Categoría Seleccionada" : ""} 
+                />
+            )
         },
         {
             id: 'unidad',
@@ -59,7 +72,7 @@ const ListarInsumos = () => {
         },
         {
             id: 'minPrecio',
-            label: 'Costo Mínimo',
+            label: 'Min Costo',
             type: 'text',
             value: filters.minPrecio,
             placeholder: '0.00',
@@ -67,19 +80,19 @@ const ListarInsumos = () => {
         },
         {
             id: 'maxPrecio',
-            label: 'Costo Máximo',
+            label: 'Max Costo',
             type: 'text',
             value: filters.maxPrecio,
             placeholder: '0.00',
             onChange: (val) => setFilters(prev => ({ ...prev, maxPrecio: val }))
         }
-    ], [filters]);
+    ], [filters]); 
 
-    // --- COLUMNAS ---
+    // --- COLUMNAS (Igual que antes) ---
     const columns = useMemo(() => [
         {
             header: 'Insumo',
-            accessor: 'nombre', // Fallback si no hay render
+            accessor: 'nombre',
             render: (row) => (
                 <div className="flex flex-col">
                     <div className="flex items-center gap-2">
@@ -104,18 +117,10 @@ const ListarInsumos = () => {
             )
         },
         {
-            header: 'Stock Mínimo',
+            header: 'Stock Min.',
             render: (row) => (
                 <span className="font-bold text-gray-700">
                     {row.stock_minimo} {row.unidad_medida}
-                </span>
-            )
-        },
-        {
-            header: 'Unidad',
-            render: (row) => (
-                <span className="text-xs font-medium text-gray-500 uppercase">
-                    {row.unidad_medida}
                 </span>
             )
         },
@@ -132,7 +137,7 @@ const ListarInsumos = () => {
             render: (row) => (
                 <button 
                     onClick={() => setItemToToggle(row)}
-                    className={`px-3 py-1 font-bold text-xs rounded-full border transition-all hover:scale-105 ${
+                    className={`px-3 py-1 font-bold text-xs rounded-full border transition-all ${
                         row.estado === 1 ? 'text-emerald-700 bg-emerald-100 border-emerald-200' : 'text-red-700 bg-red-50 border-red-100'
                     }`}
                 >
@@ -143,20 +148,17 @@ const ListarInsumos = () => {
         {
             header: 'Acciones',
             render: (row) => (
-                <div className="flex justify-start gap-2">
-                    <Link 
-                        to={`/superadmin/editar-insumo/${row.id}`} 
-                        className="group flex items-center gap-1.5 w-fit px-3 py-1.5 rounded-md text-sm font-medium text-restaurant-secondary bg-white border border-restaurant-secondary/30 hover:bg-restaurant-secondary hover:text-white transition-all duration-200 shadow-sm"
-                    >
-                        <PencilSquareIcon className="w-4 h-4" /> 
-                        <span>Editar</span>
-                    </Link>
-                </div>
+                <Link 
+                    to={`/superadmin/editar-insumo/${row.id}`} 
+                    className="w-fit flex items-center gap-1 px-3 py-1 text-sm font-medium text-restaurant-secondary border border-restaurant-secondary/30 rounded hover:bg-restaurant-secondary hover:text-white transition-colors"
+                >
+                    <PencilSquareIcon className="w-4 h-4" /> Editar
+                </Link>
             )
         }
     ], []);
 
-    // --- CARGA DE DATOS ---
+    // --- FETCH DATA ---
     const fetchInsumos = useCallback(async (page, currentFilters) => {
         setLoading(true);
         try {
@@ -170,7 +172,6 @@ const ListarInsumos = () => {
         }
     }, []);
 
-    // Debounce para filtros
     useEffect(() => {
         const handler = setTimeout(() => {
             fetchInsumos(1, filters);
@@ -183,6 +184,7 @@ const ListarInsumos = () => {
             search: '',
             unidad: '',
             estado: '',
+            categoriaId: '', // Esto dispara el clearTrigger del combobox
             minPrecio: '',
             maxPrecio: ''
         });
@@ -194,7 +196,7 @@ const ListarInsumos = () => {
         try {
             await toggleInsumoEstado(id);
             fetchInsumos(paginationInfo.currentPage, filters);
-            setAlert({ type: 'success', message: 'Estado del insumo actualizado.' });
+            setAlert({ type: 'success', message: 'Estado actualizado.' });
         } catch (err) { setAlert({ type: 'error', message: 'Error al cambiar estado.' }); }
     };
 
@@ -203,7 +205,7 @@ const ListarInsumos = () => {
             <div className="flex justify-between items-center mb-8">
                 <div>
                     <h1 className="text-3xl font-serif font-bold text-restaurant-primary">Insumos</h1>
-                    <p className="text-sm text-gray-500 mt-1">Gestión de materia prima y costos</p>
+                    <p className="text-sm text-gray-500 mt-1">Gestión de materia prima</p>
                 </div>
                 <Link to="/superadmin/agregar-insumo" className="bg-restaurant-primary text-white px-5 py-2.5 rounded-lg font-bold flex items-center gap-2 shadow-md hover:bg-red-900 transition-colors">
                     <ArchiveBoxIcon className="w-5 h-5"/> Nuevo Insumo
@@ -220,12 +222,11 @@ const ListarInsumos = () => {
                 />
             )}
 
-            {/* AHORA PASAMOS LOS FILTROS COMO ARRAY AL COMPONENTE TABLE */}
             <Table 
                 columns={columns} 
                 data={insumos} 
                 loading={loading}
-                filters={filtersList} // <--- Array de configuración
+                filters={filtersList} 
                 onClearFilters={clearFilters}
                 pagination={{ 
                     currentPage: paginationInfo.currentPage, 
