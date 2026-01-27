@@ -10,16 +10,21 @@ export const getCategorias = async (pageNumber = 1, search = '', type = '', stat
     size: 8,
   });
   
+  // Filtro por búsqueda
   if (search && search.trim()) {
     params.append('search', search);
   }
   
+  // Filtro por Tipo
   if (type !== null && type !== undefined && type !== '') {
     params.append('type', type);
   }
 
+  // Filtro por Estado
   if (status !== null && status !== undefined && status !== '') {
-    params.append('status', status);
+    const booleanStatus = (status === '1' || status === 1) ? 'true' : 'false';
+    
+    params.append('estado', booleanStatus);
   }
 
   const response = await fetchWithAuth(`${BASE_URL}?${params.toString()}`, { 
