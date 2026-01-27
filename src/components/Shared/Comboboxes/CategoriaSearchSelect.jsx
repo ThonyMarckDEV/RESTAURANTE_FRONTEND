@@ -2,11 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { getCategorias } from 'services/categoriaService';
 import { TagIcon, ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
-/**
- * @param {number|number[]} categoryTypes - Tipo(s) de categoría a buscar (ej: 2 o [1, 2]). Si es null trae todas.
- * @param {object} initialValue - Valor inicial {id, nombre}
- * @param {function} onSelect - Retorna el objeto seleccionado o null
- */
+
 const CategoriaSearchSelect = ({ categoryTypes, onSelect, initialValue }) => {
     const [inputValue, setInputValue] = useState(initialValue?.nombre || '');
     const [suggestions, setSuggestions] = useState([]);
@@ -51,7 +47,6 @@ const CategoriaSearchSelect = ({ categoryTypes, onSelect, initialValue }) => {
         const handleClickOutside = (event) => {
             if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
                 setShowSuggestions(false);
-                // Si el usuario escribió pero no seleccionó nada, revertimos al valor seleccionado válido o limpiamos
                 if (!initialValue?.id && inputValue !== '') setInputValue('');
                 if (initialValue?.id && inputValue !== initialValue.nombre) setInputValue(initialValue.nombre);
             }
@@ -69,7 +64,7 @@ const CategoriaSearchSelect = ({ categoryTypes, onSelect, initialValue }) => {
     const handleClear = (e) => {
         e.stopPropagation();
         setInputValue('');
-        onSelect(null); // Limpiar selección
+        onSelect(null);
     };
 
     return (

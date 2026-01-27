@@ -12,6 +12,9 @@ const ListarInsumos = () => {
     const [alert, setAlert] = useState(null);
     const [itemToToggle, setItemToToggle] = useState(null);
     const [insumos, setInsumos] = useState([]);
+    
+    const [selectedCategoryObj, setSelectedCategoryObj] = useState(null);
+
     const [paginationInfo, setPaginationInfo] = useState({ currentPage: 1, totalPages: 1 });
 
     const [filters, setFilters] = useState({
@@ -34,14 +37,16 @@ const ListarInsumos = () => {
             onChange: (val) => setFilters(prev => ({ ...prev, search: val }))
         },
         {
-            id: 'categoria',
+            id: 'categoriaId',
             label: 'Categoría',
-            type: 'custom',
-            render: (
+            component: (
                 <CategoriaSearchSelect 
-                    onSelect={(cat) => setFilters(prev => ({ ...prev, categoriaId: cat.id }))}
-                    clearTrigger={filters.categoriaId === ''}
-                    currentValue={filters.categoriaId ? "Categoría Seleccionada" : ""} 
+                    categoryTypes={[1]} // 1 = Insumos
+                    initialValue={selectedCategoryObj}
+                    onSelect={(cat) => {
+                        setSelectedCategoryObj(cat);
+                        setFilters(prev => ({ ...prev, categoriaId: cat ? cat.id : '' }));
+                    }}
                 />
             )
         },
@@ -86,9 +91,9 @@ const ListarInsumos = () => {
             placeholder: '0.00',
             onChange: (val) => setFilters(prev => ({ ...prev, maxPrecio: val }))
         }
-    ], [filters]); 
+    ], [filters, selectedCategoryObj]);
 
-    // --- COLUMNAS (Igual que antes) ---
+    // --- COLUMNAS ---
     const columns = useMemo(() => [
         {
             header: 'Insumo',
@@ -184,10 +189,11 @@ const ListarInsumos = () => {
             search: '',
             unidad: '',
             estado: '',
-            categoriaId: '', // Esto dispara el clearTrigger del combobox
+            categoriaId: '',
             minPrecio: '',
             maxPrecio: ''
         });
+        setSelectedCategoryObj(null);
     };
 
     const handleToggle = async () => {
