@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { getProductosVenta, toggleProductoVentaEstado } from 'services/productoVentaService'; 
-import LoadingScreen from 'components/Shared/LoadingScreen';
+import CategoriaSearchSelect from 'components/Shared/Comboboxes/CategoriaSearchSelect';
 import AlertMessage from 'components/Shared/Errors/AlertMessage';
 import ConfirmModal from 'components/Shared/Modals/ConfirmModal';
 import Table from 'components/Shared/Tables/Table';
@@ -12,9 +12,55 @@ const ListarProductosVenta = () => {
     const [alert, setAlert] = useState(null);
     const [itemToToggle, setItemToToggle] = useState(null);
     const [productos, setProductos] = useState([]);
-    const [paginationInfo, setPaginationInfo] = useState({ currentPage: 1, totalPages: 1 });
-    const [searchTerm, setSearchTerm] = useState('');
+    
+    const [selectedCategoryObj, setSelectedCategoryObj] = useState(null);
 
+    const [paginationInfo, setPaginationInfo] = useState({ currentPage: 1, totalPages: 1 });
+
+    const [filters, setFilters] = useState({
+        search: '',
+        categoriaId: '',
+        estado: ''
+    });
+
+    // --- FILTROS ---
+    const filtersList = useMemo(() => [
+        {
+            id: 'search',
+            label: 'Buscar',
+            type: 'text',
+            value: filters.search,
+            placeholder: 'Nombre del producto...',
+            onChange: (val) => setFilters(prev => ({ ...prev, search: val }))
+        },
+        {
+            id: 'categoriaId',
+            label: 'Categoría',
+            component: (
+                <CategoriaSearchSelect 
+                    categoryTypes={2}
+                    initialValue={selectedCategoryObj}
+                    onSelect={(cat) => {
+                        setSelectedCategoryObj(cat);
+                        setFilters(prev => ({ ...prev, categoriaId: cat ? cat.id : '' }));
+                    }}
+                />
+            )
+        },
+        {
+            id: 'estado',
+            label: 'Estado',
+            type: 'select',
+            value: filters.estado,
+            onChange: (val) => setFilters(prev => ({ ...prev, estado: val })),
+            options: [
+                { value: '1', label: 'Activos' },
+                { value: '0', label: 'Inactivos' }
+            ]
+        }
+    ], [filters, selectedCategoryObj]);
+
+    // --- COLUMNAS (Sin cambios) ---
     const columns = useMemo(() => [
         {
             header: 'Producto',
@@ -25,9 +71,7 @@ const ListarProductosVenta = () => {
                         <span className="font-bold text-gray-800">{row.nombre}</span>
                     </div>
                     {row.marca && (
-                        <span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full w-fit mt-1 ml-7">
-                            {row.marca}
-                        </span>
+                        <span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full w-fit mt-1 ml-7">{row.marca}</span>
                     )}
                 </div>
             )
@@ -41,31 +85,12 @@ const ListarProductosVenta = () => {
                 </div>
             )
         },
-        // --- CAMBIO: COLUMNA DE COSTO (Separada) ---
-        {
-            header: 'Costo',
-            render: (row) => (
-                <span className="text-gray-600 font-medium font-mono">
-                    S/ {parseFloat(row.precio_compra).toFixed(2)}
-                </span>
-            )
-        },
-        // --- CAMBIO: COLUMNA DE VENTA (Separada y resaltada) ---
         {
             header: 'P. Venta',
             render: (row) => (
                 <span className="text-emerald-700 font-bold font-mono text-base">
                     S/ {parseFloat(row.precio_venta).toFixed(2)}
                 </span>
-            )
-        },
-        {
-            header: 'Stock Mín.',
-            render: (row) => (
-                <div className="flex items-center gap-1 text-gray-700">
-                     <span className="font-bold">{row.stock_minimo}</span> 
-                     <span className="text-xs text-gray-500">unid.</span>
-                </div>
             )
         },
         {
@@ -84,25 +109,32 @@ const ListarProductosVenta = () => {
         {
             header: 'Acciones',
             render: (row) => (
-                <div className="flex justify-start gap-2">
-                    <Link 
-                        to={`/admin/editar-producto-venta/${row.id}`} 
-                        className="group flex items-center gap-1.5 w-fit px-3 py-1.5 rounded-md text-sm font-medium text-restaurant-secondary bg-white border border-restaurant-secondary/30 hover:bg-restaurant-secondary hover:text-white transition-all duration-200 shadow-sm"
-                    >
-                        <PencilSquareIcon className="w-4 h-4" /> 
-                        <span>Editar</span>
-                    </Link>
-                </div>
+                <Link 
+                    to={`/admin/editar-producto-venta/${row.id}`} 
+                    className="w-fit flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-restaurant-secondary bg-white border border-restaurant-secondary/30 hover:bg-restaurant-secondary hover:text-white transition-all duration-200 shadow-sm"
+                >
+                    <PencilSquareIcon className="w-4 h-4" /> 
+                    <span>Editar</span>
+                </Link>
             )
         }
     ], []);
 
-    const fetchProductos = useCallback(async (page, search = '') => {
+    // --- FETCH DATA ---
+    const fetchProductos = useCallback(async (page, currentFilters) => {
         setLoading(true);
         try {
-            const response = await getProductosVenta(page, search);
+            const response = await getProductosVenta(
+                page, 
+                currentFilters.search, 
+                currentFilters.categoriaId, 
+                currentFilters.estado
+            );
             setProductos(response.data.content);
-            setPaginationInfo({ currentPage: response.data.currentPage, totalPages: response.data.totalPages });
+            setPaginationInfo({ 
+                currentPage: response.data.currentPage, 
+                totalPages: response.data.totalPages 
+            });
         } catch (err) {
             setAlert({ type: 'error', message: 'Error al cargar los productos.' });
         } finally {
@@ -111,21 +143,26 @@ const ListarProductosVenta = () => {
     }, []);
 
     useEffect(() => {
-        const handler = setTimeout(() => fetchProductos(1, searchTerm), 500);
+        const handler = setTimeout(() => {
+            fetchProductos(1, filters);
+        }, 500);
         return () => clearTimeout(handler);
-    }, [searchTerm, fetchProductos]);
+    }, [filters, fetchProductos]);
 
     const handleToggle = async () => {
         const id = itemToToggle.id;
         setItemToToggle(null);
         try {
             await toggleProductoVentaEstado(id);
-            fetchProductos(paginationInfo.currentPage, searchTerm);
+            fetchProductos(paginationInfo.currentPage, filters);
             setAlert({ type: 'success', message: 'Estado del producto actualizado.' });
         } catch (err) { setAlert({ type: 'error', message: 'Error al cambiar estado.' }); }
     };
 
-    if (loading && productos.length === 0) return <LoadingScreen />;
+    const clearFilters = () => {
+        setFilters({ search: '', categoriaId: '', estado: '' });
+        setSelectedCategoryObj(null);
+    };
 
     return (
         <div className="container mx-auto p-6 min-h-screen">
@@ -150,9 +187,16 @@ const ListarProductosVenta = () => {
             )}
 
             <Table 
-                columns={columns} data={productos} loading={loading}
-                pagination={{ currentPage: paginationInfo.currentPage, totalPages: paginationInfo.totalPages, onPageChange: (page) => fetchProductos(page, searchTerm) }}
-                onSearch={setSearchTerm} searchPlaceholder="Buscar producto..."
+                columns={columns} 
+                data={productos} 
+                loading={loading}
+                filters={filtersList} 
+                onClearFilters={clearFilters}
+                pagination={{ 
+                    currentPage: paginationInfo.currentPage, 
+                    totalPages: paginationInfo.totalPages, 
+                    onPageChange: (page) => fetchProductos(page, filters) 
+                }}
             />
         </div>
     );

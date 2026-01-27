@@ -10,17 +10,14 @@ export const getCategorias = async (pageNumber = 1, search = '', type = '', stat
     size: 8,
   });
   
-  // Filtro por búsqueda de texto
   if (search && search.trim()) {
     params.append('search', search);
   }
   
-  // Filtro por Tipo (1, 2, 3, 4)
   if (type !== null && type !== undefined && type !== '') {
     params.append('type', type);
   }
 
-  // Filtro por Estado (0 o 1)
   if (status !== null && status !== undefined && status !== '') {
     params.append('status', status);
   }

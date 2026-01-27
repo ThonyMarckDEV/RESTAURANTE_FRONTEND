@@ -5,12 +5,18 @@ import { handleResponse } from 'utilities/Responses/handleResponse';
 const BASE_URL = `${API_BASE_URL}/api/productos-venta`;
 
 // Listar paginado
-export const getProductosVenta = async (pageNumber = 1, search = '') => {
+export const getProductosVenta = async (pageNumber = 1, search = '', categoriaId = '', estado = '') => {
   const params = new URLSearchParams({
     page: pageNumber - 1,
-    size: 10,
+    size: 8,
   });
+
   if (search.trim()) params.append('search', search);
+  if (categoriaId) params.append('categoriaId', categoriaId);
+  
+  if (estado !== '') {
+      params.append('estado', estado === '1' ? 'true' : 'false');
+  }
 
   const response = await fetchWithAuth(`${BASE_URL}?${params.toString()}`, { 
     method: 'GET', 
