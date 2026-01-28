@@ -65,7 +65,10 @@ import Home from 'ui/home/Home';
   import AgregarMesero from 'ui/Administrador/meseros/agregarMesero/AgregarMesero';
   import ListarMeseros from 'ui/Administrador/meseros/listarMeseros/ListarMeseros';
   import EditarMesero from 'ui/Administrador/meseros/editarMesero/EditarMesero';
-
+  //RUTAS INSUMOS
+  import AgregarCompraInsumo from 'ui/Administrador/compraInsumo/agregarCompraInsumo/AgregarCompraInsumo';
+  import ListarComprasInsumos from 'ui/Administrador/compraInsumo/listarComprasInsumos/ListarComprasInsumos';
+  //import EditarMesero from 'ui/Administrador/meseros/editarMesero/EditarMesero';
 
 
 
@@ -202,6 +205,14 @@ function AppContent() {
           <Route path="listar-meseros" element={<ListarMeseros />} />
           {/* Ruta Editar Mesero */}
           <Route path="editar-mesero/:id" element={<EditarMesero />} />
+
+        {/* RUTAS COMPRAS INSUMOS */}
+          {/* Ruta Agregar Insumo */}
+          <Route path="agregar-compra-insumo" element={<AgregarCompraInsumo />} />
+          {/* Ruta Listar Insumos */}
+          <Route path="listar-compras-insumos" element={<ListarComprasInsumos />} />
+          {/* Ruta Editar Insumo */}
+          {/* <Route path="editar-compra-insumo/:id" element={<EditarMesero />} /> */}
 
 
       </Route>
