@@ -1,11 +1,11 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Bars3Icon, ChevronDownIcon, PowerIcon, XMarkIcon, ListBulletIcon, ClipboardDocumentCheckIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, ChevronDownIcon, PowerIcon, XMarkIcon, ListBulletIcon } from '@heroicons/react/24/outline';
 import jwtUtils from 'utilities/Token/jwtUtils';
 import { logout } from 'js/logout';
 import ConfirmModal from 'components/Shared/Modals/ConfirmModal';
-import { BeefIcon, Building, ChartBarIcon, Home, Settings, ShoppingBasket, ShoppingCartIcon, Soup, UserCircle2Icon, UserIcon, PillBottle, Boxes, ListCheckIcon } from 'lucide-react';
-import { FaCashRegister, FaMoneyBill, FaUserGraduate } from 'react-icons/fa';
+import { BeefIcon, Building, Home, ShoppingBasket, ShoppingCartIcon, Soup, UserCircle2Icon, UserIcon, PillBottle, Boxes, ListCheckIcon } from 'lucide-react';
+import { FaCashRegister, FaUserGraduate } from 'react-icons/fa';
 
 const menus = {
     superadmin: [
