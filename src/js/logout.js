@@ -1,7 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import jwtUtils from 'utilities/Token/jwtUtils';
-import { fetchWithAuth } from 'js/authToken';
 import API_BASE_URL from 'js/urlHelper';
 import LoadingScreen from 'components/Shared/LoadingScreen';
 

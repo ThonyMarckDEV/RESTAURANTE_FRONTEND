@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { getAlmacenes, toggleAlmacenEstado } from 'services/almacenService'; 
-import LoadingScreen from 'components/Shared/LoadingScreen';
 import AlertMessage from 'components/Shared/Errors/AlertMessage';
 import ConfirmModal from 'components/Shared/Modals/ConfirmModal';
 import Table from 'components/Shared/Tables/Table';
