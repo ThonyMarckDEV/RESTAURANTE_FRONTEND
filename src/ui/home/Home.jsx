@@ -41,6 +41,13 @@ const Home = () => {
         </p>
       )}
 
+      
+      {rol === "mesero" && (
+        <p className="mt-4 text-red-700 font-semibold">
+          Herramientas del mesero.
+        </p>
+      )}
+
       {!rol && (
         <p className="mt-4 text-red-600 font-semibold">
           No se encontró un rol válido.

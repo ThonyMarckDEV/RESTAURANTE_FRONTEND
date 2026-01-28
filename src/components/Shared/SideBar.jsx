@@ -4,8 +4,8 @@ import { Bars3Icon, ChevronDownIcon, PowerIcon, XMarkIcon, ListBulletIcon, Clipb
 import jwtUtils from 'utilities/Token/jwtUtils';
 import { logout } from 'js/logout';
 import ConfirmModal from 'components/Shared/Modals/ConfirmModal';
-import { BeefIcon, Building, ChartBarIcon, Home, Settings, ShoppingBasket, ShoppingCartIcon, Soup, UserCircle2Icon, UserIcon, PillBottle, Boxes } from 'lucide-react';
-import { FaCashRegister, FaMoneyBill } from 'react-icons/fa';
+import { BeefIcon, Building, ChartBarIcon, Home, Settings, ShoppingBasket, ShoppingCartIcon, Soup, UserCircle2Icon, UserIcon, PillBottle, Boxes, UserCogIcon } from 'lucide-react';
+import { FaCashRegister, FaMoneyBill, FaUserGraduate } from 'react-icons/fa';
 
 const menus = {
     superadmin: [
@@ -27,6 +27,7 @@ const menus = {
         { section: 'Cajeros', icon: UserCircle2Icon, subs: [{ name: 'Agregar Cajero', link: '/admin/agregar-cajero' }, { name: 'Listar Cajeros', link: '/admin/listar-cajeros' }] },
         { section: 'Cajas', icon: FaCashRegister, subs: [{ name: 'Agregar Caja', link: '/admin/agregar-caja' }, { name: 'Listar Cajas', link: '/admin/listar-cajas' }] },
         { section: 'Sesiones Caja', icon: FaMoneyBill, subs: [{ name: 'Listar Sesiones Caja', link: '/admin/listar-sesiones-caja' }] },
+        { section: 'Meseros', icon: FaUserGraduate, subs: [{ name: 'Agregar Mesero', link: '/admin/agregar-mesero' }, { name: 'Listar Meseros', link: '/admin/listar-meseros' }] },
         { section: 'Productos', icon: PillBottle, subs: [{ name: 'Agregar Producto', link: '/admin/agregar-producto-venta' }, { name: 'Listar Productos', link: '/admin/listar-productos-venta' }] },
         { section: 'Platos', icon: Soup, subs: [{ name: 'Agregar Plato', link: '/admin/agregar-plato' }, { name: 'Listar Platos', link: '/admin/listar-platos' }] },
         { section: 'Compras Insumos', icon: ShoppingBasket, subs: [{ name: 'Hacer Compra', link: '/admin/agregar-compra-insumo' }, { name: 'Listar Compras', link: '/admin/listar-compras-insumos' }] },
