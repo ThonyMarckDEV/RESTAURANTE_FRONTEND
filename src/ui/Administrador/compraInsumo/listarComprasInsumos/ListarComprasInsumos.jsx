@@ -31,7 +31,7 @@ const ListarComprasInsumos = () => {
             label: 'Buscar Proveedor',
             type: 'text',
             value: filters.search,
-            placeholder: 'Razón Social...',
+            placeholder: 'Razón Social o RUC...',
             onChange: (val) => setFilters(prev => ({ ...prev, search: val }))
         },
         {
@@ -59,9 +59,20 @@ const ListarComprasInsumos = () => {
         {
             header: 'Proveedor',
             render: (row) => (
-                <div className="flex items-center gap-2">
-                    <UserIcon className="w-4 h-4 text-gray-400"/>
-                    <span className="font-bold text-gray-700 text-sm">{row.proveedor}</span>
+                <div className="flex items-start gap-2">
+                    <div className="mt-1">
+                        <UserIcon className="w-4 h-4 text-gray-400"/>
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="font-bold text-gray-700 text-sm leading-tight">
+                            {row.proveedor}
+                        </span>
+                        {row.proveedorRuc && (
+                            <span className="text-[10px] text-gray-400 font-mono mt-0.5">
+                                RUC: {row.proveedorRuc}
+                            </span>
+                        )}
+                    </div>
                 </div>
             )
         },
@@ -87,7 +98,7 @@ const ListarComprasInsumos = () => {
             render: (row) => (
                 <div className="flex items-center gap-2">
                     
-                    {/* BOTÓN VER DETALLE (Estilo ListarPlatos adaptado a Azul) */}
+                    {/* BOTÓN VER DETALLE  */}
                     <button 
                         onClick={() => handleViewDetails(row.id)}
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold text-blue-600 bg-white border border-blue-200 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
@@ -96,7 +107,7 @@ const ListarComprasInsumos = () => {
                         <EyeIcon className="w-4 h-4" /> Ver
                     </button>
 
-                    {/* BOTÓN EDITAR (Estilo ListarPlatos idéntico) */}
+                    {/* BOTÓN EDITAR  */}
                     <Link 
                         to={`/admin/editar-compra-insumo/${row.id}`}
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold text-restaurant-secondary bg-white border border-restaurant-secondary/30 hover:bg-restaurant-secondary hover:text-white transition-all shadow-sm"
