@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import CategoriaSearchSelect from 'components/Shared/Comboboxes/CategoriaSearchSelect';
 import { CubeIcon, TagIcon } from '@heroicons/react/24/outline';
+import { isTextOnly } from 'utilities/Validations/validations';
 
 const InsumoForm = ({ formData, onChange }) => {
     
@@ -16,13 +17,7 @@ const InsumoForm = ({ formData, onChange }) => {
     }, [formData.categoriaId, formData.categoriaNombre, selectedCategoryObj]);
 
     const handleNameChange = (e) => {
-        const { value } = e.target;
-        
-        const soloLetrasRegex = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]*$/;
-
-        if (soloLetrasRegex.test(value)) {
-            onChange(e);
-        }
+        if (isTextOnly(e.target.value)) onChange(e);
     };
 
     const unidades = [
@@ -54,7 +49,7 @@ const InsumoForm = ({ formData, onChange }) => {
                     </label>
                     
                     <CategoriaSearchSelect 
-                        categoryTypes={[1]} // 1 = INSUMOS
+                        categoryTypes={[1]} 
                         initialValue={selectedCategoryObj}
                         onSelect={(cat) => {
                             setSelectedCategoryObj(cat);
@@ -66,13 +61,12 @@ const InsumoForm = ({ formData, onChange }) => {
                             });
                         }}
                     />
-                    
                     <p className="text-[10px] text-gray-400 mt-1 ml-1">
                         Busca la categoría a la que pertenece este insumo.
                     </p>
                 </div>
 
-                {/* 2. Nombre (CON VALIDACIÓN) */}
+                {/* 2. Nombre */}
                 <div className="col-span-1 md:col-span-2">
                     <label className="block text-sm font-bold text-gray-700 mb-1">
                         Nombre del Insumo <span className="text-red-500">*</span>
@@ -81,7 +75,7 @@ const InsumoForm = ({ formData, onChange }) => {
                         type="text"
                         name="nombre"
                         value={formData.nombre}
-                        onChange={handleNameChange} // <--- Usamos la función con validación
+                        onChange={handleNameChange}
                         placeholder="Ej: Papa Amarilla, Aceite Vegetal..."
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent outline-none transition-all bg-white"
                         required

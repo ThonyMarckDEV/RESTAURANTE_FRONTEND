@@ -1,16 +1,13 @@
 import React from 'react';
 import { TagIcon, SwatchIcon } from '@heroicons/react/24/outline';
+import { isTextOnly } from 'utilities/Validations/validations';
 
 const CategoriaForm = ({ formData, onChange }) => {
   const inputClass = "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-1 focus:ring-restaurant-secondary focus:border-restaurant-secondary outline-none text-sm transition-all";
   const labelClass = "block text-xs font-bold text-gray-600 mb-1";
 
   const handleLetterChange = (e) => {
-    const { value } = e.target;
-    // Permite letras y espacios
-    if (value === '' || /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/.test(value)) {
-      onChange(e);
-    }
+    if (isTextOnly(e.target.value)) onChange(e);
   };
 
   return (
@@ -36,7 +33,7 @@ const CategoriaForm = ({ formData, onChange }) => {
           />
         </div>
 
-        {/* Tipo de Categoría (NUEVO) */}
+        {/* Tipo de Categoría */}
         <div>
             <label className={labelClass}>Tipo de Ítem</label>
             <div className="relative">

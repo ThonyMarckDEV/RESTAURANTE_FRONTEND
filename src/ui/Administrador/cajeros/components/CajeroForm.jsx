@@ -1,24 +1,17 @@
 import React from 'react';
 import { UserCircleIcon, IdentificationIcon, KeyIcon } from '@heroicons/react/24/outline';
+import { isNumeric, isTextOnly } from 'utilities/Validations/validations';
 
 const CajeroForm = ({ datosData, cuentaData, onChangeDatos, onChangeCuenta, isEditing = false }) => {
   const inputClass = "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-1 focus:ring-restaurant-secondary focus:border-restaurant-secondary outline-none text-sm transition-all";
   const labelClass = "block text-xs font-bold text-gray-600 mb-1";
 
-  // Validación para permitir solo números
   const handleNumberChange = (e) => {
-    const { value } = e.target;
-    if (value === '' || /^[0-9]*$/.test(value)) {
-      onChangeDatos(e);
-    }
+    if (isNumeric(e.target.value)) onChangeDatos(e);
   };
 
-  // Validación para permitir solo letras, espacios y tildes
   const handleLetterChange = (e) => {
-    const { value } = e.target;
-    if (value === '' || /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/.test(value)) {
-      onChangeDatos(e);
-    }
+    if (isTextOnly(e.target.value)) onChangeDatos(e);
   };
 
   return (

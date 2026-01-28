@@ -1,16 +1,14 @@
 import React from 'react';
 import { BuildingOffice2Icon } from '@heroicons/react/24/outline';
+import { isNumeric } from 'utilities/Validations/validations';
 
 const SedeForm = ({ formData = {}, onChange }) => {
     
     const inputClass = "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-1 focus:ring-restaurant-secondary focus:border-restaurant-secondary outline-none text-sm transition-all";
     const labelClass = "block text-xs font-bold text-gray-600 mb-1";
 
-    // Función para filtrar solo números y mantener el estado limpio
     const handleNumberChange = (e) => {
-        const { value } = e.target;
-        // Permite solo dígitos para cumplir con el formato de SUNAT
-        if (value === '' || /^[0-9]*$/.test(value)) {
+        if (isNumeric(e.target.value)) {
             onChange(e);
         }
     };
@@ -51,7 +49,7 @@ const SedeForm = ({ formData = {}, onChange }) => {
                     <input 
                         name="codigo_sunat" 
                         value={formData?.codigo_sunat || ''} 
-                        onChange={handleNumberChange} 
+                        onChange={handleNumberChange}
                         className={inputClass} 
                         maxLength={4} 
                         placeholder="Ej. 0001"

@@ -1,23 +1,16 @@
 import React from 'react';
 import { UserIcon, IdentificationIcon, PhoneIcon } from '@heroicons/react/24/outline';
+import { isNumeric } from 'utilities/Validations/validations';
 
 const ProveedorForm = ({ formData, onChange }) => {
   const inputClass = "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-1 focus:ring-restaurant-secondary focus:border-restaurant-secondary outline-none text-sm transition-all";
   const labelClass = "block text-xs font-bold text-gray-600 mb-1";
 
-  // Función para validar antes de llamar al onChange del padre
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
-    // Validación para campos numéricos (RUC y Teléfono)
-    if (name === 'ruc' || name === 'telefono') {
-      // 1. Regex: /^\d*$/ permite solo dígitos (0-9) o cadena vacía
-      if (!/^\d*$/.test(value)) {
-        return; // Si no es número, no hace nada (ignora la tecla)
-      }
+    if ((name === 'ruc' || name === 'telefono') && !isNumeric(value)) {
+        return; 
     }
-
-    // Si pasa la validación, propagamos el evento al padre
     onChange(e);
   };
 
@@ -37,7 +30,7 @@ const ProveedorForm = ({ formData, onChange }) => {
           <input 
             name="razon_social" 
             value={formData.razon_social} 
-            onChange={onChange} // Este no necesita validación numérica
+            onChange={onChange} 
             className={inputClass} 
             placeholder="Nombre de la empresa"
             required 
@@ -54,16 +47,15 @@ const ProveedorForm = ({ formData, onChange }) => {
             <input 
               name="ruc" 
               value={formData.ruc} 
-              onChange={handleInputChange} // Usamos nuestro handler personalizado
+              onChange={handleInputChange} 
               className={`${inputClass} pl-10`} 
-              maxLength={11} // Límite físico de caracteres
-              minLength={11} // Para validación de formulario HTML
+              maxLength={11} 
+              minLength={11} 
               placeholder="10XXXXXXXXX"
-              inputMode="numeric" // Abre el teclado numérico en móviles
+              inputMode="numeric" 
               required 
             />
           </div>
-          {/* Pequeña ayuda visual si no tiene 11 dígitos */}
           {formData.ruc && formData.ruc.length !== 11 && (
             <p className="text-[10px] text-red-500 mt-1">* Debe tener 11 dígitos</p>
           )}
@@ -79,16 +71,15 @@ const ProveedorForm = ({ formData, onChange }) => {
             <input 
               name="telefono" 
               value={formData.telefono} 
-              onChange={handleInputChange} // Usamos nuestro handler personalizado
+              onChange={handleInputChange} 
               className={`${inputClass} pl-10`} 
-              maxLength={9}  // Máximo 9
-              minLength={9}  // Mínimo 9
+              maxLength={9}  
+              minLength={9}  
               placeholder="999888777"
-              inputMode="numeric" // Abre el teclado numérico en móviles
+              inputMode="numeric" 
               required 
             />
           </div>
-          {/* Pequeña ayuda visual si no tiene 9 dígitos */}
           {formData.telefono && formData.telefono.length !== 9 && (
             <p className="text-[10px] text-red-500 mt-1">* Debe tener 9 dígitos</p>
           )}

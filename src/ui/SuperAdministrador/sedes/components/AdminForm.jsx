@@ -1,25 +1,17 @@
 import React from 'react';
 import { UserCircleIcon } from '@heroicons/react/24/outline';
+import { isNumeric, isTextOnly } from 'utilities/Validations/validations';
 
 const AdminForm = ({ formData, onChange }) => {
   const inputClass = "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-1 focus:ring-restaurant-secondary focus:border-restaurant-secondary outline-none text-sm transition-all";
   const labelClass = "block text-xs font-bold text-gray-600 mb-1";
 
-  // Validación para permitir solo números (DNI, Teléfono)
   const handleNumberChange = (e) => {
-    const { value } = e.target;
-    if (value === '' || /^[0-9]*$/.test(value)) {
-      onChange(e);
-    }
+    if (isNumeric(e.target.value)) onChange(e);
   };
 
-  // Validación para permitir solo letras, espacios y tildes (Nombres, Apellidos)
   const handleLetterChange = (e) => {
-    const { value } = e.target;
-    // Permite letras (A-Z, a-z), tildes, ñ y espacios
-    if (value === '' || /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/.test(value)) {
-      onChange(e);
-    }
+    if (isTextOnly(e.target.value)) onChange(e);
   };
 
   return (
