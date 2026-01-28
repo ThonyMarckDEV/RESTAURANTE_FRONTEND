@@ -136,6 +136,15 @@ function AppContent() {
           {/* Ruta Editar Insumo */}
           <Route path="editar-insumo/:id" element={<EditarInsumo />} />
 
+        {/* RUTAS PRODUCTOS */}
+          {/* Ruta Agregar Producto */}
+          <Route path="agregar-producto-venta" element={<AgregarProductoVenta />} />
+          {/* Ruta Listar Productos */}
+          <Route path="listar-productos-venta" element={<ListarProductosVenta />} />
+          {/* Ruta Editar Producto */}
+          <Route path="editar-producto-venta/:id" element={<EditarProductoVenta />} />
+
+
 
 
       </Route>
@@ -205,6 +214,14 @@ function AppContent() {
           <Route path="listar-meseros" element={<ListarMeseros />} />
           {/* Ruta Editar Mesero */}
           <Route path="editar-mesero/:id" element={<EditarMesero />} />
+
+          {/* RUTAS INSUMOS */}
+          {/* Ruta Agregar Insumo */}
+          <Route path="agregar-insumo" element={<AgregarInsumo />} />
+          {/* Ruta Listar Insumos */}
+          <Route path="listar-insumos" element={<ListarInsumos />} />
+          {/* Ruta Editar Insumo */}
+          <Route path="editar-insumo/:id" element={<EditarInsumo />} />
 
         {/* RUTAS COMPRAS INSUMOS */}
           {/* Ruta Agregar Insumo */}
