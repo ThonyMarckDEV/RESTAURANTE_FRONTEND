@@ -57,6 +57,10 @@ import Home from 'ui/home/Home';
   import AgregarCajero from 'ui/Administrador/cajeros/agregarCajero/AgregarCajero';
   import ListarCajeros from 'ui/Administrador/cajeros/listarCajeros/ListarCajeros';
   import EditarCajero from 'ui/Administrador/cajeros/editarCajero/EditarCajero';
+  //RUTAS CAJAS
+  import AgregarCaja from 'ui/Administrador/cajas/agregarCaja/AgregarCaja';
+  import ListarCajas from 'ui/Administrador/cajas/listarCajas/ListarCajas';
+  import EditarCaja from 'ui/Administrador/cajas/editarCaja/EditarCaja';
 
 // Utilities
 import ProtectedRouteHome from 'utilities/ProtectedRoutes/ProtectedRouteHome';
@@ -174,6 +178,14 @@ function AppContent() {
           <Route path="listar-cajeros" element={<ListarCajeros />} />
           {/* Ruta Editar Cajero */}
           <Route path="editar-cajero/:id" element={<EditarCajero />} />
+
+        {/* RUTAS CAJAS */}
+          {/* Ruta Agregar Caja */}
+          <Route path="agregar-caja" element={<AgregarCaja />} />
+          {/* Ruta Listar Cajas */}
+          <Route path="listar-cajas" element={<ListarCajas />} />
+          {/* Ruta Editar Caja */}
+          <Route path="editar-caja/:id" element={<EditarCaja />} />
 
 
       </Route>
