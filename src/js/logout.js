@@ -16,12 +16,12 @@ export async function logout() {
     root.render(<LoadingScreen />);
 
     // Llamar al backend para eliminar la sesión
-      await fetchWithAuth(`${API_BASE_URL}/api/logout`, {
+      await fetch(`${API_BASE_URL}/api/auth/logout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ token: jwtUtils.getAccessTokenFromCookie()}),
+        body: JSON.stringify({ refresh_token: jwtUtils.getRefreshTokenFromCookie()}),
       });
 
     // Redirigir a la página principal
