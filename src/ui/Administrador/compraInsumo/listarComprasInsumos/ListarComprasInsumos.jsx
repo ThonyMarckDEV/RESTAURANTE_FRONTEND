@@ -4,7 +4,7 @@ import { getComprasInsumos, showCompraInsumo } from 'services/compraInsumoServic
 import AlertMessage from 'components/Shared/Errors/AlertMessage';
 import Table from 'components/Shared/Tables/Table';
 import ViewModal from 'components/Shared/Modals/ViewModal';
-import { EyeIcon, ShoppingBagIcon, CalendarIcon, UserIcon, CalculatorIcon } from '@heroicons/react/24/outline';
+import { EyeIcon, ShoppingBagIcon, CalendarIcon, UserIcon, CalculatorIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
 import { formatDate, formatMoney } from 'utilities/Formatters/formatters';
 
 const ListarComprasInsumos = () => {
@@ -85,13 +85,25 @@ const ListarComprasInsumos = () => {
         {
             header: 'Acciones',
             render: (row) => (
-                <button 
-                    onClick={() => handleViewDetails(row.id)}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-bold text-blue-600 bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-colors"
-                >
-                    <EyeIcon className="w-4 h-4" /> 
-                    Ver Detalle
-                </button>
+                <div className="flex items-center gap-2">
+                    {/* Botón Ver Detalle */}
+                    <button 
+                        onClick={() => handleViewDetails(row.id)}
+                        className="flex items-center gap-1 px-2 py-1.5 rounded text-xs font-bold text-blue-600 bg-blue-50 border border-blue-200 hover:bg-blue-100"
+                        title="Ver Detalle"
+                    >
+                        <EyeIcon className="w-4 h-4" /> 
+                    </button>
+
+                    {/* Botón Editar - Solo habilitado si la fecha es hoy (opcional validar en front) */}
+                    <Link 
+                        to={`/admin/editar-compra-insumo/${row.id}`}
+                        className="flex items-center gap-1 px-2 py-1.5 rounded text-xs font-bold text-amber-600 bg-amber-50 border border-amber-200 hover:bg-amber-100"
+                        title="Corregir Compra"
+                    >
+                        <PencilSquareIcon className="w-4 h-4" />
+                    </Link>
+                </div>
             )
         }
     ], []);

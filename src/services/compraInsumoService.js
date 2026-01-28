@@ -37,3 +37,12 @@ export const showCompraInsumo = async (id) => {
   const response = await fetchWithAuth(`${BASE_URL}/${id}`, { method: 'GET' });
   return handleResponse(response);
 };
+
+export const updateCompraInsumo = async (id, data) => {
+  const response = await fetchWithAuth(`${BASE_URL}/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  return handleResponse(response);
+};

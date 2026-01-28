@@ -48,7 +48,7 @@ const AgregarCompraInsumo = () => {
     };
 
     try {
-      const response = await createCompraInsumo(payload);
+      await createCompraInsumo(payload);
       setAlert({ type: 'success', message: 'Compra registrada y stock actualizado correctamente.' });
       
       // Resetear o redirigir

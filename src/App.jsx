@@ -68,7 +68,7 @@ import Home from 'ui/home/Home';
   //RUTAS INSUMOS
   import AgregarCompraInsumo from 'ui/Administrador/compraInsumo/agregarCompraInsumo/AgregarCompraInsumo';
   import ListarComprasInsumos from 'ui/Administrador/compraInsumo/listarComprasInsumos/ListarComprasInsumos';
-  //import EditarMesero from 'ui/Administrador/meseros/editarMesero/EditarMesero';
+  import EditarCompraInsumo from 'ui/Administrador/compraInsumo/editarCompraInsumo/EditarCompraInsumo';
 
 
 
@@ -212,7 +212,7 @@ function AppContent() {
           {/* Ruta Listar Insumos */}
           <Route path="listar-compras-insumos" element={<ListarComprasInsumos />} />
           {/* Ruta Editar Insumo */}
-          {/* <Route path="editar-compra-insumo/:id" element={<EditarMesero />} /> */}
+          <Route path="editar-compra-insumo/:id" element={<EditarCompraInsumo />} />
 
 
       </Route>

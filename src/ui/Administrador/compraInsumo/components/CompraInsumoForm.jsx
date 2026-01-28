@@ -1,15 +1,14 @@
 import React, { useState, useMemo } from 'react';
 import ProveedorSearchSelect from 'components/Shared/Comboboxes/ProveedorSearchSelect';
 import AlmacenSearchSelect from 'components/Shared/Comboboxes/AlmacenSearchSelect';
-import InsumoSearchSelect from 'components/Shared/Comboboxes/InsumoSearchSelect'
+import InsumoSearchSelect from 'components/Shared/Comboboxes/InsumoSearchSelect';
 import { ShoppingCartIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { isNumeric } from 'utilities/Validations/validations';
 
-const CompraInsumoForm = ({ formData, setFormData, isViewOnly = false }) => {
+// CORRECCIÓN 1: Agregamos isAlmacenLocked a las props
+const CompraInsumoForm = ({ formData, setFormData, isViewOnly = false, isAlmacenLocked = false }) => {
     
-    // --- ESTADOS LOCALES PARA LA LÍNEA QUE SE ESTÁ AGREGANDO ---
     const [lineItem, setLineItem] = useState({
-        insumo: null, // Objeto {id, nombre}
+        insumo: null, 
         cantidad: '',
         precio: ''
     });
@@ -17,22 +16,17 @@ const CompraInsumoForm = ({ formData, setFormData, isViewOnly = false }) => {
     const inputClass = "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-1 focus:ring-restaurant-secondary focus:border-restaurant-secondary outline-none text-sm transition-all";
     const labelClass = "block text-xs font-bold text-gray-600 mb-1";
 
-    // --- MANEJADORES DE CABECERA ---
     const handleHeaderChange = (field, value) => {
         setFormData(prev => ({ ...prev, [field]: value }));
     };
 
-    // --- MANEJADORES DE LÍNEA DE DETALLE ---
     const handleLineChange = (e) => {
         const { name, value } = e.target;
-        // Validación numérica estricta para cantidad y precio
         if (name === 'cantidad') {
-            // Cantidad solo permite enteros positivos
             if (value === '' || /^\d*$/.test(value)) {
                 setLineItem(prev => ({ ...prev, [name]: value }));
             }
         } else if (name === 'precio') {
-            // Precio permite decimales (punto o coma)
             if (value === '' || /^\d*([.,]\d{0,2})?$/.test(value)) {
                 setLineItem(prev => ({ ...prev, [name]: value }));
             }
@@ -49,18 +43,17 @@ const CompraInsumoForm = ({ formData, setFormData, isViewOnly = false }) => {
         const newItem = {
             insumo_id: lineItem.insumo.id,
             nombre_insumo: lineItem.insumo.nombre,
+            unidad_medida: lineItem.insumo.unidad, 
             cantidad: parseInt(lineItem.cantidad),
             precio: parseFloat(precioNormalizado),
-            subtotal: parseInt(lineItem.cantidad) * parseFloat(lineItem.precio)
+            subtotal: parseInt(lineItem.cantidad) * parseFloat(precioNormalizado)
         };
 
-        // Agregar a la lista de detalles del padre
         setFormData(prev => ({
             ...prev,
             detalles: [...prev.detalles, newItem]
         }));
 
-        // Limpiar inputs de línea
         setLineItem({ insumo: null, cantidad: '', precio: '' });
     };
 
@@ -71,15 +64,37 @@ const CompraInsumoForm = ({ formData, setFormData, isViewOnly = false }) => {
         }));
     };
 
-    // --- CÁLCULO DE TOTAL AUTOMÁTICO ---
     const totalCalculado = useMemo(() => {
         return formData.detalles.reduce((acc, item) => acc + item.subtotal, 0);
     }, [formData.detalles]);
 
+    const handleRowChange = (index, field, value) => {
+        // Validaciones igual que al agregar
+        if (field === 'cantidad') {
+            if (value !== '' && !/^\d*$/.test(value)) return;
+        }
+        if (field === 'precio') {
+            if (value !== '' && !/^\d*([.,]\d{0,2})?$/.test(value)) return;
+        }
+
+        const newDetalles = [...formData.detalles];
+        newDetalles[index][field] = value;
+
+        // Recalcular subtotal si hay datos válidos
+        const cant = parseInt(newDetalles[index].cantidad) || 0;
+        
+        // Normalizar precio (coma a punto) para el cálculo
+        const precioStr = String(newDetalles[index].precio).replace(',', '.');
+        const precio = parseFloat(precioStr) || 0;
+
+        newDetalles[index].subtotal = cant * precio;
+
+        setFormData(prev => ({ ...prev, detalles: newDetalles }));
+    };
+
     return (
         <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-restaurant-primary h-fit">
             
-            {/* --- ENCABEZADO --- */}
             <div className="flex items-center gap-3 mb-6 border-b border-gray-100 pb-3">
                 <div className="p-2 bg-restaurant-surface rounded-full">
                     <ShoppingCartIcon className="w-6 h-6 text-restaurant-secondary" />
@@ -89,7 +104,6 @@ const CompraInsumoForm = ({ formData, setFormData, isViewOnly = false }) => {
                 </h2>
             </div>
 
-            {/* --- SECCIÓN 1: DATOS GENERALES (CABECERA) --- */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 <div>
                     <label className={labelClass}>Proveedor <span className="text-red-500">*</span></label>
@@ -104,29 +118,46 @@ const CompraInsumoForm = ({ formData, setFormData, isViewOnly = false }) => {
                 </div>
                 <div>
                     <label className={labelClass}>Almacén Destino <span className="text-red-500">*</span></label>
-                    {isViewOnly ? (
-                        <div className="p-2 bg-gray-100 rounded text-sm">{formData.almacenNombre}</div>
+                    
+                    {/* CORRECCIÓN 2: Lógica para bloquear el almacén si isAlmacenLocked es true */}
+                    {isViewOnly || isAlmacenLocked ? (
+                        <div className={`p-2 rounded text-sm border ${isAlmacenLocked ? 'bg-yellow-50 border-yellow-200 text-yellow-800' : 'bg-gray-100 border-gray-200'}`}>
+                            {formData.almacenObj?.nombre || 'Cargando...'}
+                            {isAlmacenLocked && <span className="ml-2 text-[10px] font-bold">(No editable)</span>}
+                        </div>
                     ) : (
                         <AlmacenSearchSelect 
-                            tipos={[1, 2]} // 1=Seco, 2=Congelado (Típicos para insumos)
+                            tipos={[1, 2]}
                             initialValue={formData.almacenObj}
                             onSelect={(alm) => handleHeaderChange('almacenObj', alm)}
                         />
                     )}
-                    {!isViewOnly && <p className="text-[10px] text-gray-400 mt-1">El stock se sumará a este almacén.</p>}
+                    
+                    {!isViewOnly && !isAlmacenLocked && <p className="text-[10px] text-gray-400 mt-1">El stock se sumará a este almacén.</p>}
                 </div>
             </div>
 
-            {/* --- SECCIÓN 2: AGREGAR ITEMS (Solo si no es vista de lectura) --- */}
             {!isViewOnly && (
                 <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
                     <h3 className="text-sm font-bold text-restaurant-secondary mb-3 uppercase tracking-wide">Agregar Insumos</h3>
                     <div className="grid grid-cols-12 gap-3 items-end">
-                        <div className="col-span-12 md:col-span-5">
-                            <label className={labelClass}>Insumo</label>
+                      <div className="col-span-12 md:col-span-5">
+                            <div className="flex justify-between items-end mb-1">
+                                <label className={labelClass}>Insumo</label>
+                                {lineItem.insumo?.unidad && (
+                                    <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100 uppercase tracking-wider">
+                                        {lineItem.insumo.unidad}
+                                    </span>
+                                )}
+                            </div>
+                            
                             <InsumoSearchSelect 
                                 initialValue={lineItem.insumo}
-                                onSelect={(ins) => setLineItem(prev => ({ ...prev, insumo: ins }))}
+                                onSelect={(ins) => setLineItem(prev => ({ 
+                                    ...prev, 
+                                    insumo: ins,
+                                    precio: ins?.precio || prev.precio
+                                }))}
                             />
                         </div>
                         <div className="col-span-6 md:col-span-2">
@@ -172,10 +203,11 @@ const CompraInsumoForm = ({ formData, setFormData, isViewOnly = false }) => {
                     <thead className="text-xs text-gray-700 uppercase bg-gray-100">
                         <tr>
                             <th className="px-4 py-3">Insumo</th>
-                            <th className="px-4 py-3 text-center">Cant.</th>
-                            <th className="px-4 py-3 text-right">Precio Unit.</th>
-                            <th className="px-4 py-3 text-right">Subtotal</th>
-                            {!isViewOnly && <th className="px-4 py-3 text-center">Acción</th>}
+                            {/* Ancho fijo para inputs */}
+                            <th className="px-4 py-3 text-center w-24">Cant.</th>
+                            <th className="px-4 py-3 text-right w-32">Precio Unit.</th>
+                            <th className="px-4 py-3 text-right w-32">Subtotal</th>
+                            {!isViewOnly && <th className="px-4 py-3 text-center w-16">Acción</th>}
                         </tr>
                     </thead>
                     <tbody>
@@ -188,18 +220,63 @@ const CompraInsumoForm = ({ formData, setFormData, isViewOnly = false }) => {
                         ) : (
                             formData.detalles.map((item, index) => (
                                 <tr key={index} className="bg-white border-b hover:bg-gray-50">
-                                    <td className="px-4 py-3 font-medium text-gray-900">{item.nombre_insumo}</td>
-                                    <td className="px-4 py-3 text-center">{item.cantidad}</td>
-                                    <td className="px-4 py-3 text-right">S/ {parseFloat(item.precio).toFixed(2)}</td>
-                                    <td className="px-4 py-3 text-right font-bold text-gray-800">S/ {item.subtotal.toFixed(2)}</td>
+                                    
+                                   <td className="px-4 py-3 font-medium text-gray-900 align-middle">
+                                        <div className="flex items-center gap-2">
+                                            <span>{item.nombre_insumo}</span>
+                                            
+                                            {/* Badge de Unidad de Medida */}
+                                            {item.unidad_medida && (
+                                                <span className="text-[10px] font-bold text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200 uppercase tracking-wide">
+                                                    {item.unidad_medida}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </td>
+                                    
+                                    {/* --- CANTIDAD --- */}
+                                    <td className="px-4 py-3 text-center align-middle">
+                                        {isViewOnly ? (
+                                            item.cantidad
+                                        ) : (
+                                            <input 
+                                                value={item.cantidad}
+                                                onChange={(e) => handleRowChange(index, 'cantidad', e.target.value)}
+                                                className="w-full text-center border border-gray-300 rounded px-1 py-1 focus:ring-1 focus:ring-emerald-500 outline-none"
+                                            />
+                                        )}
+                                    </td>
+
+                                    {/* --- PRECIO --- */}
+                                    <td className="px-4 py-3 text-right align-middle">
+                                        {isViewOnly ? (
+                                            `S/ ${parseFloat(item.precio).toFixed(2)}`
+                                        ) : (
+                                            <div className="relative">
+                                                <span className="absolute left-2 top-1 text-gray-400 text-xs">S/</span>
+                                                <input 
+                                                    value={item.precio}
+                                                    onChange={(e) => handleRowChange(index, 'precio', e.target.value)}
+                                                    className="w-full text-right border border-gray-300 rounded pl-6 pr-2 py-1 focus:ring-1 focus:ring-emerald-500 outline-none"
+                                                />
+                                            </div>
+                                        )}
+                                    </td>
+
+                                    {/* --- SUBTOTAL (Calculado) --- */}
+                                    <td className="px-4 py-3 text-right font-bold text-gray-800 align-middle">
+                                        S/ {item.subtotal.toFixed(2)}
+                                    </td>
+
                                     {!isViewOnly && (
-                                        <td className="px-4 py-3 text-center">
+                                        <td className="px-4 py-3 text-center align-middle">
                                             <button 
                                                 type="button"
                                                 onClick={() => removeLineItem(index)}
-                                                className="text-red-500 hover:text-red-700 p-1 bg-red-50 rounded hover:bg-red-100 transition-colors"
+                                                className="text-red-500 hover:text-red-700 p-1.5 hover:bg-red-50 rounded transition-colors"
+                                                title="Eliminar fila"
                                             >
-                                                <TrashIcon className="w-4 h-4" />
+                                                <TrashIcon className="w-5 h-5" />
                                             </button>
                                         </td>
                                     )}
@@ -207,7 +284,6 @@ const CompraInsumoForm = ({ formData, setFormData, isViewOnly = false }) => {
                             ))
                         )}
                     </tbody>
-                    {/* FOOTER DE TOTALES */}
                     <tfoot className="bg-gray-50 border-t-2 border-gray-200">
                         <tr>
                             <td colSpan={3} className="px-4 py-3 text-right font-bold text-gray-600 uppercase">Total a Pagar:</td>
@@ -219,7 +295,6 @@ const CompraInsumoForm = ({ formData, setFormData, isViewOnly = false }) => {
                     </tfoot>
                 </table>
             </div>
-
         </div>
     );
 };
