@@ -1,11 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { getInsumos } from 'services/insumoService';
-import { CubeIcon, ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { CubeIcon, ChevronDownIcon, XMarkIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
-/**
- * Componente para buscar y seleccionar Insumos (Arroz, Pollo, Aceite, etc.)
- */
-const InsumoSearchSelect = ({ onSelect, initialValue }) => {
+const InsumoSearchSelect = ({ onSelect, initialValue, excludedIds = [] }) => {
 
     const [inputValue, setInputValue] = useState(initialValue?.nombre || '');
     const [suggestions, setSuggestions] = useState([]);
@@ -22,7 +19,6 @@ const InsumoSearchSelect = ({ onSelect, initialValue }) => {
             lastIdRef.current = null;
             return;
         }
-
         const newId = initialValue.id || initialValue;
         const newName = initialValue.nombre;
 
@@ -35,12 +31,7 @@ const InsumoSearchSelect = ({ onSelect, initialValue }) => {
     const fetchInsumos = async (searchTerm = '') => {
         setLoading(true);
         try {
-
-            const filters = {
-                search: searchTerm,
-                estado: 1
-            };
-
+            const filters = { search: searchTerm, estado: 1 };
             const response = await getInsumos(1, filters);
             
             const data = response.data.content || response.data || [];
@@ -65,7 +56,9 @@ const InsumoSearchSelect = ({ onSelect, initialValue }) => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const handleSelect = (insumo) => {
+    const handleSelect = (insumo, isDisabled) => {
+        if (isDisabled) return; // Si está deshabilitado, no hace nada
+
         setInputValue(insumo.nombre);
         lastIdRef.current = insumo.id;
         
@@ -116,20 +109,38 @@ const InsumoSearchSelect = ({ onSelect, initialValue }) => {
             {showSuggestions && (
                 <ul className="absolute z-[50] w-full bg-white border border-gray-100 rounded-lg mt-1 shadow-xl max-h-60 overflow-auto">
                     {suggestions.length > 0 ? (
-                        suggestions.map(ins => (
-                            <li 
-                                key={ins.id} 
-                                onClick={() => handleSelect(ins)} 
-                                className="px-4 py-2 hover:bg-orange-50 hover:text-orange-700 cursor-pointer text-sm border-b border-gray-50 last:border-none flex justify-between items-center"
-                            >
-                                <span>{ins.nombre}</span>
-                                {ins.unidad_medida && (
-                                    <span className="text-[10px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded uppercase">
-                                        {ins.unidad_medida}
-                                    </span>
-                                )}
-                            </li>
-                        ))
+                        suggestions.map(ins => {
+                            // VERIFICAR SI ESTÁ EXCLUIDO
+                            const isDisabled = excludedIds.includes(ins.id);
+
+                            return (
+                                <li 
+                                    key={ins.id} 
+                                    onClick={() => handleSelect(ins, isDisabled)} 
+                                    className={`px-4 py-2 text-sm border-b border-gray-50 last:border-none flex justify-between items-center transition-colors
+                                        ${isDisabled 
+                                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-70' // Estilo bloqueado
+                                            : 'hover:bg-orange-50 hover:text-orange-700 cursor-pointer text-gray-700' // Estilo normal
+                                        }
+                                    `}
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <span>{ins.nombre}</span>
+                                        {isDisabled && (
+                                            <span className="flex items-center gap-1 text-[10px] text-red-400 italic">
+                                                <ExclamationCircleIcon className="w-3 h-3"/> Ya agregado
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    {ins.unidad_medida && (
+                                        <span className={`text-[10px] px-2 py-0.5 rounded uppercase ${isDisabled ? 'bg-gray-200' : 'bg-gray-100 text-gray-500'}`}>
+                                            {ins.unidad_medida}
+                                        </span>
+                                    )}
+                                </li>
+                            );
+                        })
                     ) : (
                         <li className="px-4 py-3 text-gray-400 text-xs italic text-center">No se encontraron insumos</li>
                     )}

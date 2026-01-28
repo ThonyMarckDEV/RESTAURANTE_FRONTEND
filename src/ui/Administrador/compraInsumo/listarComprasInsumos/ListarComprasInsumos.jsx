@@ -86,22 +86,23 @@ const ListarComprasInsumos = () => {
             header: 'Acciones',
             render: (row) => (
                 <div className="flex items-center gap-2">
-                    {/* Botón Ver Detalle */}
+                    
+                    {/* BOTÓN VER DETALLE (Estilo ListarPlatos adaptado a Azul) */}
                     <button 
                         onClick={() => handleViewDetails(row.id)}
-                        className="flex items-center gap-1 px-2 py-1.5 rounded text-xs font-bold text-blue-600 bg-blue-50 border border-blue-200 hover:bg-blue-100"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold text-blue-600 bg-white border border-blue-200 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
                         title="Ver Detalle"
                     >
-                        <EyeIcon className="w-4 h-4" /> 
+                        <EyeIcon className="w-4 h-4" /> Ver
                     </button>
 
-                    {/* Botón Editar - Solo habilitado si la fecha es hoy (opcional validar en front) */}
+                    {/* BOTÓN EDITAR (Estilo ListarPlatos idéntico) */}
                     <Link 
                         to={`/admin/editar-compra-insumo/${row.id}`}
-                        className="flex items-center gap-1 px-2 py-1.5 rounded text-xs font-bold text-amber-600 bg-amber-50 border border-amber-200 hover:bg-amber-100"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold text-restaurant-secondary bg-white border border-restaurant-secondary/30 hover:bg-restaurant-secondary hover:text-white transition-all shadow-sm"
                         title="Corregir Compra"
                     >
-                        <PencilSquareIcon className="w-4 h-4" />
+                        <PencilSquareIcon className="w-4 h-4" /> Editar
                     </Link>
                 </div>
             )
@@ -234,7 +235,10 @@ const ListarComprasInsumos = () => {
                                     <tbody className="divide-y divide-gray-100 bg-white">
                                         {selectedCompra.detalles.map((det, idx) => (
                                             <tr key={idx} className="hover:bg-gray-50 transition-colors">
-                                                <td className="px-4 py-3 font-medium text-gray-800">{det.insumo}</td>
+                                                <td className="px-4 py-3 font-medium text-gray-800">
+                                                    {det.insumo}
+                                                    {det.unidad && <span className="ml-2 text-[10px] text-gray-500 bg-gray-200 px-1 rounded">{det.unidad}</span>}
+                                                </td>
                                                 <td className="px-4 py-3 text-center text-gray-600 font-mono">{det.cantidad}</td>
                                                 <td className="px-4 py-3 text-right text-gray-500">{formatMoney(det.precio)}</td>
                                                 <td className="px-4 py-3 text-right font-bold text-gray-800">{formatMoney(det.subtotal)}</td>

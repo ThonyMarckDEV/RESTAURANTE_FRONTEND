@@ -2,9 +2,9 @@ import React, { useState, useMemo } from 'react';
 import ProveedorSearchSelect from 'components/Shared/Comboboxes/ProveedorSearchSelect';
 import AlmacenSearchSelect from 'components/Shared/Comboboxes/AlmacenSearchSelect';
 import InsumoSearchSelect from 'components/Shared/Comboboxes/InsumoSearchSelect';
-import { ShoppingCartIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { ShoppingCartIcon, PlusIcon, TrashIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
+import { isNumeric, isDecimalMoney } from 'utilities/Validations/validations'; 
 
-// CORRECCIÓN 1: Agregamos isAlmacenLocked a las props
 const CompraInsumoForm = ({ formData, setFormData, isViewOnly = false, isAlmacenLocked = false }) => {
     
     const [lineItem, setLineItem] = useState({
@@ -16,18 +16,29 @@ const CompraInsumoForm = ({ formData, setFormData, isViewOnly = false, isAlmacen
     const inputClass = "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-1 focus:ring-restaurant-secondary focus:border-restaurant-secondary outline-none text-sm transition-all";
     const labelClass = "block text-xs font-bold text-gray-600 mb-1";
 
+    const isDuplicate = useMemo(() => {
+        if (!lineItem.insumo) return false;
+        return formData.detalles.some(d => d.insumo_id === lineItem.insumo.id);
+    }, [lineItem.insumo, formData.detalles]);
+
+    const selectedInsumoIds = useMemo(() => {
+        return formData.detalles.map(d => d.insumo_id);
+    }, [formData.detalles]);
+
     const handleHeaderChange = (field, value) => {
         setFormData(prev => ({ ...prev, [field]: value }));
     };
 
+    // --- REFACTORIZADO CON VALIDACIONES CENTRALIZADAS ---
     const handleLineChange = (e) => {
         const { name, value } = e.target;
+        
         if (name === 'cantidad') {
-            if (value === '' || /^\d*$/.test(value)) {
+            if (isNumeric(value)) { // Usando helper
                 setLineItem(prev => ({ ...prev, [name]: value }));
             }
         } else if (name === 'precio') {
-            if (value === '' || /^\d*([.,]\d{0,2})?$/.test(value)) {
+            if (isDecimalMoney(value)) { // Usando helper
                 setLineItem(prev => ({ ...prev, [name]: value }));
             }
         } else {
@@ -37,6 +48,7 @@ const CompraInsumoForm = ({ formData, setFormData, isViewOnly = false, isAlmacen
 
     const addLineItem = () => {
         if (!lineItem.insumo || !lineItem.cantidad || !lineItem.precio) return;
+        if (isDuplicate) return;
 
         const precioNormalizado = lineItem.precio.replace(',', '.');
 
@@ -68,22 +80,17 @@ const CompraInsumoForm = ({ formData, setFormData, isViewOnly = false, isAlmacen
         return formData.detalles.reduce((acc, item) => acc + item.subtotal, 0);
     }, [formData.detalles]);
 
+    // --- REFACTORIZADO CON VALIDACIONES CENTRALIZADAS ---
     const handleRowChange = (index, field, value) => {
-        // Validaciones igual que al agregar
-        if (field === 'cantidad') {
-            if (value !== '' && !/^\d*$/.test(value)) return;
-        }
-        if (field === 'precio') {
-            if (value !== '' && !/^\d*([.,]\d{0,2})?$/.test(value)) return;
-        }
+        // Validamos antes de actualizar
+        if (field === 'cantidad' && !isNumeric(value)) return;
+        if (field === 'precio' && !isDecimalMoney(value)) return;
 
         const newDetalles = [...formData.detalles];
         newDetalles[index][field] = value;
 
-        // Recalcular subtotal si hay datos válidos
+        // Cálculos
         const cant = parseInt(newDetalles[index].cantidad) || 0;
-        
-        // Normalizar precio (coma a punto) para el cálculo
         const precioStr = String(newDetalles[index].precio).replace(',', '.');
         const precio = parseFloat(precioStr) || 0;
 
@@ -95,6 +102,7 @@ const CompraInsumoForm = ({ formData, setFormData, isViewOnly = false, isAlmacen
     return (
         <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-restaurant-primary h-fit">
             
+            {/* Header */}
             <div className="flex items-center gap-3 mb-6 border-b border-gray-100 pb-3">
                 <div className="p-2 bg-restaurant-surface rounded-full">
                     <ShoppingCartIcon className="w-6 h-6 text-restaurant-secondary" />
@@ -104,6 +112,7 @@ const CompraInsumoForm = ({ formData, setFormData, isViewOnly = false, isAlmacen
                 </h2>
             </div>
 
+            {/* Datos Generales */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 <div>
                     <label className={labelClass}>Proveedor <span className="text-red-500">*</span></label>
@@ -118,8 +127,6 @@ const CompraInsumoForm = ({ formData, setFormData, isViewOnly = false, isAlmacen
                 </div>
                 <div>
                     <label className={labelClass}>Almacén Destino <span className="text-red-500">*</span></label>
-                    
-                    {/* CORRECCIÓN 2: Lógica para bloquear el almacén si isAlmacenLocked es true */}
                     {isViewOnly || isAlmacenLocked ? (
                         <div className={`p-2 rounded text-sm border ${isAlmacenLocked ? 'bg-yellow-50 border-yellow-200 text-yellow-800' : 'bg-gray-100 border-gray-200'}`}>
                             {formData.almacenObj?.nombre || 'Cargando...'}
@@ -132,16 +139,23 @@ const CompraInsumoForm = ({ formData, setFormData, isViewOnly = false, isAlmacen
                             onSelect={(alm) => handleHeaderChange('almacenObj', alm)}
                         />
                     )}
-                    
                     {!isViewOnly && !isAlmacenLocked && <p className="text-[10px] text-gray-400 mt-1">El stock se sumará a este almacén.</p>}
                 </div>
             </div>
 
+            {/* Agregar Insumos */}
             {!isViewOnly && (
-                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
-                    <h3 className="text-sm font-bold text-restaurant-secondary mb-3 uppercase tracking-wide">Agregar Insumos</h3>
+                <div className={`p-4 rounded-lg border mb-6 transition-colors ${isDuplicate ? 'bg-red-50 border-red-200' : 'bg-gray-50 border-gray-200'}`}>
+                    
+                    <div className="flex justify-between items-center mb-3">
+                        <h3 className={`text-sm font-bold uppercase tracking-wide ${isDuplicate ? 'text-red-600' : 'text-restaurant-secondary'}`}>
+                            {isDuplicate ? 'Este insumo ya está en lista' : 'Agregar Insumos'}
+                        </h3>
+                        {isDuplicate && <span className="text-xs text-red-500 font-medium">Edite la cantidad en la tabla inferior</span>}
+                    </div>
+
                     <div className="grid grid-cols-12 gap-3 items-end">
-                      <div className="col-span-12 md:col-span-5">
+                        <div className="col-span-12 md:col-span-5">
                             <div className="flex justify-between items-end mb-1">
                                 <label className={labelClass}>Insumo</label>
                                 {lineItem.insumo?.unidad && (
@@ -153,6 +167,7 @@ const CompraInsumoForm = ({ formData, setFormData, isViewOnly = false, isAlmacen
                             
                             <InsumoSearchSelect 
                                 initialValue={lineItem.insumo}
+                                excludedIds={selectedInsumoIds} 
                                 onSelect={(ins) => setLineItem(prev => ({ 
                                     ...prev, 
                                     insumo: ins,
@@ -168,6 +183,7 @@ const CompraInsumoForm = ({ formData, setFormData, isViewOnly = false, isAlmacen
                                 onChange={handleLineChange}
                                 className={inputClass}
                                 placeholder="0"
+                                disabled={isDuplicate} 
                             />
                         </div>
                         <div className="col-span-6 md:col-span-3">
@@ -180,6 +196,7 @@ const CompraInsumoForm = ({ formData, setFormData, isViewOnly = false, isAlmacen
                                     onChange={handleLineChange}
                                     className={`${inputClass} pl-8`}
                                     placeholder="0.00"
+                                    disabled={isDuplicate} 
                                 />
                             </div>
                         </div>
@@ -187,23 +204,30 @@ const CompraInsumoForm = ({ formData, setFormData, isViewOnly = false, isAlmacen
                             <button 
                                 type="button"
                                 onClick={addLineItem}
-                                disabled={!lineItem.insumo || !lineItem.cantidad || !lineItem.precio}
-                                className="w-full bg-emerald-600 text-white py-2 rounded-md hover:bg-emerald-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex justify-center items-center gap-1"
+                                disabled={!lineItem.insumo || !lineItem.cantidad || !lineItem.precio || isDuplicate}
+                                className={`w-full py-2 rounded-md transition-colors flex justify-center items-center gap-1 text-white
+                                    ${isDuplicate 
+                                        ? 'bg-gray-400 cursor-not-allowed' 
+                                        : 'bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300 disabled:cursor-not-allowed'
+                                    }`}
                             >
-                                <PlusIcon className="w-4 h-4" /> Agregar
+                                {isDuplicate ? (
+                                    <> <ExclamationCircleIcon className="w-4 h-4"/> Ya en lista </>
+                                ) : (
+                                    <> <PlusIcon className="w-4 h-4" /> Agregar </>
+                                )}
                             </button>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* --- SECCIÓN 3: TABLA DE DETALLES --- */}
+            {/* Tabla de Detalles */}
             <div className="overflow-x-auto border border-gray-200 rounded-lg">
                 <table className="w-full text-sm text-left text-gray-500">
                     <thead className="text-xs text-gray-700 uppercase bg-gray-100">
                         <tr>
                             <th className="px-4 py-3">Insumo</th>
-                            {/* Ancho fijo para inputs */}
                             <th className="px-4 py-3 text-center w-24">Cant.</th>
                             <th className="px-4 py-3 text-right w-32">Precio Unit.</th>
                             <th className="px-4 py-3 text-right w-32">Subtotal</th>
@@ -220,12 +244,9 @@ const CompraInsumoForm = ({ formData, setFormData, isViewOnly = false, isAlmacen
                         ) : (
                             formData.detalles.map((item, index) => (
                                 <tr key={index} className="bg-white border-b hover:bg-gray-50">
-                                    
-                                   <td className="px-4 py-3 font-medium text-gray-900 align-middle">
+                                    <td className="px-4 py-3 font-medium text-gray-900 align-middle">
                                         <div className="flex items-center gap-2">
                                             <span>{item.nombre_insumo}</span>
-                                            
-                                            {/* Badge de Unidad de Medida */}
                                             {item.unidad_medida && (
                                                 <span className="text-[10px] font-bold text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200 uppercase tracking-wide">
                                                     {item.unidad_medida}
@@ -234,11 +255,8 @@ const CompraInsumoForm = ({ formData, setFormData, isViewOnly = false, isAlmacen
                                         </div>
                                     </td>
                                     
-                                    {/* --- CANTIDAD --- */}
                                     <td className="px-4 py-3 text-center align-middle">
-                                        {isViewOnly ? (
-                                            item.cantidad
-                                        ) : (
+                                        {isViewOnly ? item.cantidad : (
                                             <input 
                                                 value={item.cantidad}
                                                 onChange={(e) => handleRowChange(index, 'cantidad', e.target.value)}
@@ -247,11 +265,8 @@ const CompraInsumoForm = ({ formData, setFormData, isViewOnly = false, isAlmacen
                                         )}
                                     </td>
 
-                                    {/* --- PRECIO --- */}
                                     <td className="px-4 py-3 text-right align-middle">
-                                        {isViewOnly ? (
-                                            `S/ ${parseFloat(item.precio).toFixed(2)}`
-                                        ) : (
+                                        {isViewOnly ? `S/ ${parseFloat(item.precio).toFixed(2)}` : (
                                             <div className="relative">
                                                 <span className="absolute left-2 top-1 text-gray-400 text-xs">S/</span>
                                                 <input 
@@ -263,7 +278,6 @@ const CompraInsumoForm = ({ formData, setFormData, isViewOnly = false, isAlmacen
                                         )}
                                     </td>
 
-                                    {/* --- SUBTOTAL (Calculado) --- */}
                                     <td className="px-4 py-3 text-right font-bold text-gray-800 align-middle">
                                         S/ {item.subtotal.toFixed(2)}
                                     </td>
