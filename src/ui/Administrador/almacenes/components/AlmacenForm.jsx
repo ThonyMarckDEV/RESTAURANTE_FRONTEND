@@ -1,5 +1,5 @@
 import React from 'react';
-import { BuildingStorefrontIcon, CubeIcon } from '@heroicons/react/24/outline';
+import { BuildingStorefrontIcon, CubeIcon, TagIcon } from '@heroicons/react/24/outline';
 
 const AlmacenForm = ({ formData, onChange }) => {
   const inputClass = "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-1 focus:ring-restaurant-secondary focus:border-restaurant-secondary outline-none text-sm transition-all";
@@ -26,7 +26,7 @@ const AlmacenForm = ({ formData, onChange }) => {
               value={formData.nombre} 
               onChange={onChange} 
               className={`${inputClass} pl-10`} 
-              placeholder="Ej: Cocina Principal, Barra, Congeladora 1"
+              placeholder="Ej: Almacén Seco Principal, Cámara Fría 1"
               required 
             />
           </div>
@@ -45,18 +45,32 @@ const AlmacenForm = ({ formData, onChange }) => {
           />
         </div>
 
-        {/* Es Refrigerado */}
+        {/* Tipo de Almacén */}
         <div>
-            <label className={labelClass}>Tipo de Ambiente</label>
-            <select name="esRefrigerado" value={formData.esRefrigerado} onChange={onChange} className={inputClass}>
-                <option value={false}>Ambiente Seco / Normal</option>
-                <option value={true}>Refrigerado / Congelado</option>
-            </select>
+            <label className={labelClass}>Tipo de Almacén</label>
+            <div className="relative">
+                <TagIcon className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                <select 
+                    name="tipo_almacen" 
+                    value={formData.tipo_almacen} 
+                    onChange={onChange} 
+                    className={`${inputClass} pl-10`}
+                    required
+                >
+                    <option value={1}>Almacén Seco (General)</option>
+                    <option value={2}>Refrigerado / Congelado</option>
+                    <option value={3}>Área de Producción (Cocina)</option>
+                    <option value={4}>Punto de Venta (Barra/Caja)</option>
+                </select>
+            </div>
+            <p className="text-[10px] text-gray-400 mt-1 ml-1">
+                Define la naturaleza de los insumos que se guardarán aquí.
+            </p>
         </div>
 
         {/* Estado */}
         <div>
-            <label className={labelClass}>Estado</label>
+            <label className={labelClass}>Estado Inicial</label>
             <select name="estado" value={formData.estado} onChange={onChange} className={inputClass}>
                 <option value={1}>Activo</option>
                 <option value={0}>Inactivo</option>

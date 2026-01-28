@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { getAlmacenes, toggleAlmacenEstado } from 'services/almacenService'; 
+import LoadingScreen from 'components/Shared/LoadingScreen';
 import AlertMessage from 'components/Shared/Errors/AlertMessage';
 import ConfirmModal from 'components/Shared/Modals/ConfirmModal';
 import Table from 'components/Shared/Tables/Table';
 import { PencilSquareIcon, CubeIcon, MapPinIcon } from '@heroicons/react/24/outline';
-import { BeakerIcon } from '@heroicons/react/24/solid';
 
 const ListarAlmacenes = () => {
     const [loading, setLoading] = useState(true);
@@ -18,21 +18,45 @@ const ListarAlmacenes = () => {
         totalPages: 1 
     });
 
-    // Estado unificado de filtros
     const [filters, setFilters] = useState({
         search: '',
-        estado: ''
+        estado: '',
+        tipo: '' 
     });
+
+    // --- HELPER PARA ETIQUETAS DE TIPO ---
+    const getTipoLabel = (tipo) => {
+        switch(tipo) {
+            case 1: return { text: 'SECO', class: 'bg-gray-100 text-gray-600 border-gray-200' };
+            case 2: return { text: 'REFRIGERADO', class: 'bg-blue-50 text-blue-600 border-blue-100' };
+            case 3: return { text: 'PRODUCCIÓN', class: 'bg-orange-50 text-orange-600 border-orange-100' };
+            case 4: return { text: 'VENTA', class: 'bg-purple-50 text-purple-600 border-purple-100' };
+            default: return { text: 'OTRO', class: 'bg-gray-50 text-gray-500' };
+        }
+    };
 
     // --- 1. CONFIGURACIÓN DE FILTROS ---
     const filtersList = useMemo(() => [
         {
             id: 'search',
-            label: 'Buscar Almacén',
+            label: 'Buscar',
             type: 'text',
             value: filters.search,
-            placeholder: 'Nombre del almacén...',
+            placeholder: 'Nombre...',
             onChange: (val) => setFilters(prev => ({ ...prev, search: val }))
+        },
+        {
+            id: 'tipo',
+            label: 'Tipo',
+            type: 'select',
+            value: filters.tipo,
+            onChange: (val) => setFilters(prev => ({ ...prev, tipo: val })),
+            options: [
+                { value: '1', label: 'SECO' },
+                { value: '2', label: 'REFRIGERADO' },
+                { value: '3', label: 'PRODUCCIÓN' },
+                { value: '4', label: 'VENTA' }
+            ]
         },
         {
             id: 'estado',
@@ -58,19 +82,24 @@ const ListarAlmacenes = () => {
                         <CubeIcon className="w-5 h-5 text-restaurant-primary"/>
                         <span className="font-bold text-gray-800">{row.nombre}</span>
                     </div>
-                    {/* Indicador visual de Refrigerado */}
-                    {row.es_refrigerado && (
-                        <span className="ml-7 text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full w-fit flex items-center gap-1 mt-1">
-                            <BeakerIcon className="w-3 h-3"/> Refrigerado
-                        </span>
-                    )}
+                    {/* Etiqueta de Tipo */}
+                    <div className="ml-7 mt-1">
+                        {(() => {
+                            const badge = getTipoLabel(row.tipo_almacen);
+                            return (
+                                <span className={`text-[10px] px-2 py-0.5 rounded border font-bold ${badge.class}`}>
+                                    {badge.text}
+                                </span>
+                            );
+                        })()}
+                    </div>
                 </div>
             )
         },
         {
             header: 'Sede',
             render: (row) => (
-                <div className="flex items-center gap-2 text-gray-600">
+                <div className="flex items-center gap-2 text-gray-600 text-sm">
                     <MapPinIcon className="w-4 h-4"/>
                     <span>{row.sede_nombre}</span>
                 </div>
@@ -109,8 +138,7 @@ const ListarAlmacenes = () => {
     const fetchAlmacenes = useCallback(async (page, currentFilters) => {
         setLoading(true);
         try {
-            // Pasamos search y estado
-            const response = await getAlmacenes(page, currentFilters.search, currentFilters.estado);
+            const response = await getAlmacenes(page, currentFilters.search, currentFilters.estado, currentFilters.tipo);
             setAlmacenes(response.data.content);
             setPaginationInfo({ 
                 currentPage: response.data.currentPage, 
@@ -123,7 +151,6 @@ const ListarAlmacenes = () => {
         }
     }, []);
 
-    // Debounce para la búsqueda
     useEffect(() => {
         const handler = setTimeout(() => {
             fetchAlmacenes(1, filters);
@@ -131,7 +158,6 @@ const ListarAlmacenes = () => {
         return () => clearTimeout(handler);
     }, [filters, fetchAlmacenes]);
 
-    // --- 4. MANEJO DE ESTADO (TOGGLE) ---
     const handleToggle = async () => {
         const id = itemToToggle.id;
         setItemToToggle(null);
@@ -145,7 +171,7 @@ const ListarAlmacenes = () => {
     };
 
     const clearFilters = () => {
-        setFilters({ search: '', estado: '' });
+        setFilters({ search: '', estado: '', tipo: '' });
     };
 
     return (
@@ -155,7 +181,7 @@ const ListarAlmacenes = () => {
                     <h1 className="text-3xl font-serif font-bold text-restaurant-primary">Almacenes</h1>
                     <p className="text-sm text-gray-500 mt-1">Gestión de ubicaciones de inventario</p>
                 </div>
-                <Link to="/admin/agregar-almacen" className="bg-restaurant-primary text-white px-5 py-2.5 rounded-lg font-bold flex items-center gap-2 shadow-md hover:bg-red-900 transition-colors">
+                <Link to="/admin/agregar-almacen" className="bg-restaurant-primary text-white px-5 py-2.5 rounded-lg font-bold flex items-center gap-2 shadow-md hover:bg-red-900 transition-colors transform hover:-translate-y-0.5">
                     <CubeIcon className="w-5 h-5"/> Nuevo Almacén
                 </Link>
             </div>
@@ -173,7 +199,7 @@ const ListarAlmacenes = () => {
             <Table 
                 columns={columns} 
                 data={almacenes} 
-                loading={loading}
+                loading={loading} 
                 filters={filtersList} 
                 onClearFilters={clearFilters}
                 pagination={{ 

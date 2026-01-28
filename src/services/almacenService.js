@@ -5,7 +5,7 @@ import { handleResponse } from 'utilities/Responses/handleResponse';
 const BASE_URL = `${API_BASE_URL}/api/almacenes`;
 
 // Listar paginado
-export const getAlmacenes = async (pageNumber = 1, search = '', estado = '') => {
+export const getAlmacenes = async (pageNumber = 1, search = '', estado = '' , tipo = '') => {
   const params = new URLSearchParams({
     page: pageNumber - 1,
     size: 6,
@@ -16,6 +16,8 @@ export const getAlmacenes = async (pageNumber = 1, search = '', estado = '') => 
   if (estado !== '') {
     params.append('estado', estado === '1' ? 'true' : 'false');
   }
+
+  if (tipo !== null && tipo !== '') params.append('tipo', tipo);
 
   const response = await fetchWithAuth(`${BASE_URL}?${params.toString()}`, { 
     method: 'GET', 
