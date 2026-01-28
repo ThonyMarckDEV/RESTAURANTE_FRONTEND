@@ -40,7 +40,7 @@ const Login = () => {
       const rutas = {
           superadmin: '/superadmin',
           admin: '/admin',
-          cajero: '/asesor',
+          cajero: '/cajero',
           mesero: '/mesero',
       };
 
