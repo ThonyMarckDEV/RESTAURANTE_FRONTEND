@@ -4,7 +4,7 @@ import { Bars3Icon, ChevronDownIcon, PowerIcon, XMarkIcon, ListBulletIcon, Clipb
 import jwtUtils from 'utilities/Token/jwtUtils';
 import { logout } from 'js/logout';
 import ConfirmModal from 'components/Shared/Modals/ConfirmModal';
-import { BeefIcon, Building, ChartBarIcon, Home, Settings, ShoppingBasket, ShoppingCartIcon, Soup, UserCircle2Icon, UserIcon, PillBottle, Boxes } from 'lucide-react';
+import { BeefIcon, Building, ChartBarIcon, Home, Settings, ShoppingBasket, ShoppingCartIcon, Soup, UserCircle2Icon, UserIcon, PillBottle, Boxes, ListCheckIcon } from 'lucide-react';
 import { FaCashRegister, FaMoneyBill, FaUserGraduate } from 'react-icons/fa';
 
 const menus = {
@@ -32,6 +32,7 @@ const menus = {
         { section: 'Platos', icon: Soup, subs: [{ name: 'Agregar Plato', link: '/admin/agregar-plato' }, { name: 'Listar Platos', link: '/admin/listar-platos' }] },
         { section: 'Insumos', icon: BeefIcon, subs: [{ name: 'Agregar Insumo', link: '/admin/agregar-insumo' }, { name: 'Listar Insumos', link: '/admin/listar-insumos' }] },
         { section: 'Compras Insumos', icon: ShoppingBasket, subs: [{ name: 'Hacer Compra', link: '/admin/agregar-compra-insumo' }, { name: 'Listar Compras', link: '/admin/listar-compras-insumos' }] },
+        { section: 'Inventario Insumos', icon: ListCheckIcon, subs: [{ name: 'Listar Inventario', link: '/admin/listar-inventario-insumos' }] },
         { section: 'Productos', icon: PillBottle, subs: [{ name: 'Agregar Producto', link: '/admin/agregar-producto-venta' }, { name: 'Listar Productos', link: '/admin/listar-productos-venta' }] },
         { section: 'Compras Productos', icon: ShoppingBasket, subs: [{ name: 'Hacer Compra', link: '/admin/agregar-compra-producto' }, { name: 'Listar Compras', link: '/admin/listar-compras-productos' }] },
         { section: 'Ventas', icon: ShoppingCartIcon, subs: [{ name: 'Listar Ventas', link: '/admin/listar-ventas' }] },

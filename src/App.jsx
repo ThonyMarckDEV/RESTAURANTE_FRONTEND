@@ -39,6 +39,7 @@ import Home from 'ui/home/Home';
   import AgregarInsumo from 'ui/SuperAdministrador/insumos/agregarInsumo/AgregarInsumo';
   import ListarInsumos from 'ui/SuperAdministrador/insumos/listarInsumos/ListarInsumos';
   import EditarInsumo  from 'ui/SuperAdministrador/insumos/editarInsumo/EditarInsumo';
+  import ListarInventarioInsumos from 'ui/Administrador/inventarioInsumo/listarInventarioInsumos/ListarInventarioInsumos'
 
 // UIS ADMIN
   //RUTAS ALMACEN
@@ -69,6 +70,7 @@ import Home from 'ui/home/Home';
   import AgregarCompraInsumo from 'ui/Administrador/compraInsumo/agregarCompraInsumo/AgregarCompraInsumo';
   import ListarComprasInsumos from 'ui/Administrador/compraInsumo/listarComprasInsumos/ListarComprasInsumos';
   import EditarCompraInsumo from 'ui/Administrador/compraInsumo/editarCompraInsumo/EditarCompraInsumo';
+
 
 
 
@@ -135,7 +137,6 @@ function AppContent() {
           <Route path="listar-insumos" element={<ListarInsumos />} />
           {/* Ruta Editar Insumo */}
           <Route path="editar-insumo/:id" element={<EditarInsumo />} />
-
         {/* RUTAS PRODUCTOS */}
           {/* Ruta Agregar Producto */}
           <Route path="agregar-producto-venta" element={<AgregarProductoVenta />} />
@@ -215,13 +216,15 @@ function AppContent() {
           {/* Ruta Editar Mesero */}
           <Route path="editar-mesero/:id" element={<EditarMesero />} />
 
-          {/* RUTAS INSUMOS */}
+        {/* RUTAS INSUMOS */}
           {/* Ruta Agregar Insumo */}
           <Route path="agregar-insumo" element={<AgregarInsumo />} />
           {/* Ruta Listar Insumos */}
           <Route path="listar-insumos" element={<ListarInsumos />} />
           {/* Ruta Editar Insumo */}
           <Route path="editar-insumo/:id" element={<EditarInsumo />} />
+          {/* Ruta Listar Inventario Insumo */}
+          <Route path="listar-inventario-insumos" element={<ListarInventarioInsumos />} />
 
         {/* RUTAS COMPRAS INSUMOS */}
           {/* Ruta Agregar Insumo */}
