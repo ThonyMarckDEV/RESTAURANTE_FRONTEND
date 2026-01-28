@@ -2,7 +2,19 @@ import React from 'react';
 import { UserCircleIcon, IdentificationIcon, KeyIcon } from '@heroicons/react/24/outline';
 import { isNumeric, isTextOnly } from 'utilities/Validations/validations';
 
-const CajeroForm = ({ datosData, cuentaData, onChangeDatos, onChangeCuenta, isEditing = false }) => {
+/**
+ * Formulario genérico para cualquier empleado (Cajero, Mesero, Cocinero, etc.)
+ * @param {string} roleName - Nombre del rol para el título (Ej: "Cajero", "Mesero")
+ */
+const EmpleadoForm = ({ 
+    datosData, 
+    cuentaData, 
+    onChangeDatos, 
+    onChangeCuenta, 
+    isEditing = false,
+    roleName = "empleado" 
+}) => {
+  
   const inputClass = "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-1 focus:ring-restaurant-secondary focus:border-restaurant-secondary outline-none text-sm transition-all";
   const labelClass = "block text-xs font-bold text-gray-600 mb-1";
 
@@ -22,7 +34,7 @@ const CajeroForm = ({ datosData, cuentaData, onChangeDatos, onChangeCuenta, isEd
         <div className="p-2 bg-restaurant-surface rounded-full">
           <UserCircleIcon className="w-6 h-6 text-restaurant-secondary" />
         </div>
-        <h2 className="text-lg font-bold text-gray-800">Datos Personales</h2>
+        <h2 className="text-lg font-bold text-gray-800">Datos del {roleName}</h2>
       </div>
 
       <div className="space-y-4 mb-8">
@@ -154,7 +166,7 @@ const CajeroForm = ({ datosData, cuentaData, onChangeDatos, onChangeCuenta, isEd
                 value={cuentaData.username} 
                 onChange={onChangeCuenta} 
                 className={`${inputClass} bg-white`} 
-                placeholder="Ej. jperez"
+                placeholder={`Ej. ${datosData.nombre ? datosData.nombre.charAt(0).toLowerCase() + datosData.apellidoPaterno.toLowerCase() : 'usuario'}`}
                 required 
               />
             </div>
@@ -181,4 +193,4 @@ const CajeroForm = ({ datosData, cuentaData, onChangeDatos, onChangeCuenta, isEd
   );
 };
 
-export default CajeroForm;
+export default EmpleadoForm;

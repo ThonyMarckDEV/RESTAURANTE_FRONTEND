@@ -1,30 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { showCajero, updateCajero } from 'services/cajeroService'; 
+import { showMesero, updateMesero } from 'services/meseroService'; 
 import AlertMessage from 'components/Shared/Errors/AlertMessage';
 import LoadingScreen from 'components/Shared/LoadingScreen';
-import CajeroForm from 'components/Shared/Formularios/EmpleadoForm';
+import MeseroForm from 'components/Shared/Formularios/EmpleadoForm';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
 
 const initialFormData = {
-  cuenta: {
-    username: '',
-    password: ''
-  },
+  cuenta: { username: '', password: '' },
   datos: {
-    nombre: '',
-    apellidoPaterno: '',
-    apellidoMaterno: '', 
-    dni: '',
-    direccion: '',
-    telefono: '',
-    sexo: '',
-    estadoCivil: '', 
-    fechaNacimiento: ''
+    nombre: '', apellidoPaterno: '', apellidoMaterno: '', dni: '',
+    direccion: '', telefono: '', sexo: '', estadoCivil: '', fechaNacimiento: ''
   }
 };
 
-const EditarCajero = () => {
+const EditarMesero = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -36,14 +26,11 @@ const EditarCajero = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await showCajero(id);
-        const { username, datos_empleado } = response.data; // El backend devuelve "datos_empleado" en snake_case o camelCase según tu DTO
+        const response = await showMesero(id);
+        const { username, datos_empleado } = response.data;
 
         setFormData({
-            cuenta: {
-                username: username || '',
-                password: '' // Contraseña vacía al editar
-            },
+            cuenta: { username: username || '', password: '' },
             datos: {
                 nombre: datos_empleado.nombre || '',
                 apellidoPaterno: datos_empleado.apellidoPaterno || '',
@@ -56,10 +43,8 @@ const EditarCajero = () => {
                 telefono: datos_empleado.telefono || ''
             }
         });
-
       } catch (err) {
-        console.error(err);
-        setError("No se pudo cargar la información del cajero.");
+        setError("No se pudo cargar la información del mesero.");
       } finally {
         setLoading(false);
       }
@@ -71,21 +56,17 @@ const EditarCajero = () => {
     const { name, value } = e.target;
     setFormData(prev => ({
         ...prev,
-        [section]: {
-            ...prev[section],
-            [name]: value
-        }
+        [section]: { ...prev[section], [name]: value }
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setAlert(null);
     try {
-      const response = await updateCajero(id, formData);
-      setAlert({ type: 'success', message: response.message || 'Cajero actualizado correctamente.' });
-      setTimeout(() => navigate('/admin/listar-cajeros'), 1500);
+      await updateMesero(id, formData);
+      setAlert({ type: 'success', message: 'Mesero actualizado correctamente.' });
+      setTimeout(() => navigate('/admin/listar-meseros'), 1500);
     } catch (err) {
         let message = 'Ocurrió un error al actualizar';
         let details = [];
@@ -112,54 +93,32 @@ const EditarCajero = () => {
                 <PencilSquareIcon className="w-8 h-8"/>
              </div>
              <div>
-                 <h1 className="text-3xl font-serif font-bold text-restaurant-primary">
-                   Editar Cajero
-                 </h1>
+                 <h1 className="text-3xl font-serif font-bold text-restaurant-primary">Editar Mesero</h1>
                  <p className="text-sm text-gray-500">Actualizar información del empleado</p>
              </div>
           </div>
-          <button 
-            onClick={() => navigate('/admin/listar-cajeros')} 
-            className="text-restaurant-secondary hover:text-restaurant-primary font-bold transition-colors"
-          >
+          <button onClick={() => navigate('/admin/listar-meseros')} className="text-restaurant-secondary hover:text-restaurant-primary font-bold transition-colors">
               ← Volver al listado
           </button>
       </div>
 
-      <AlertMessage 
-        type={alert?.type} 
-        message={alert?.message} 
-        details={alert?.details}
-        onClose={() => setAlert(null)} 
-      />
+      <AlertMessage type={alert?.type} message={alert?.message} details={alert?.details} onClose={() => setAlert(null)} />
 
       <div className="max-w-4xl mx-auto">
         <form onSubmit={handleSubmit}>
-          
-          {/* COMPONENTE FORMULARIO REUTILIZABLE */}
-          <CajeroForm 
-            roleName="cajero"
+          <MeseroForm 
+            roleName="mesero"
             datosData={formData.datos}
             cuentaData={formData.cuenta}
             onChangeDatos={(e) => handleChange(e, 'datos')}
             onChangeCuenta={(e) => handleChange(e, 'cuenta')}
             isEditing={true}
           />
-
-          {/* BOTONES DE ACCIÓN */}
           <div className="flex justify-end gap-4 mt-6 pb-10">
-            <button 
-                type="button" 
-                onClick={() => navigate('/admin/listar-cajeros')}
-                className="px-6 py-3 text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
-            >
+            <button type="button" onClick={() => navigate('/admin/listar-meseros')} className="px-6 py-3 text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium">
                 Cancelar
             </button>
-            <button
-                type="submit" 
-                disabled={loading}
-                className="px-8 py-3 text-white bg-restaurant-primary rounded-lg hover:bg-red-900 disabled:opacity-70 transition-all font-bold shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
-            >
+            <button type="submit" disabled={loading} className="px-8 py-3 text-white bg-restaurant-primary rounded-lg hover:bg-red-900 disabled:opacity-70 transition-all font-bold shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
                 {loading ? 'Guardando...' : 'GUARDAR CAMBIOS'}
             </button>
           </div>
@@ -169,4 +128,4 @@ const EditarCajero = () => {
   );
 };
 
-export default EditarCajero;
+export default EditarMesero;

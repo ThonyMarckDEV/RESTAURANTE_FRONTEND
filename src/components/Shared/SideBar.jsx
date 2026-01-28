@@ -4,7 +4,7 @@ import { Bars3Icon, ChevronDownIcon, PowerIcon, XMarkIcon, ListBulletIcon, Clipb
 import jwtUtils from 'utilities/Token/jwtUtils';
 import { logout } from 'js/logout';
 import ConfirmModal from 'components/Shared/Modals/ConfirmModal';
-import { BeefIcon, Building, ChartBarIcon, Home, Settings, ShoppingBasket, ShoppingCartIcon, Soup, UserCircle2Icon, UserIcon, PillBottle, Boxes, UserCogIcon } from 'lucide-react';
+import { BeefIcon, Building, ChartBarIcon, Home, Settings, ShoppingBasket, ShoppingCartIcon, Soup, UserCircle2Icon, UserIcon, PillBottle, Boxes } from 'lucide-react';
 import { FaCashRegister, FaMoneyBill, FaUserGraduate } from 'react-icons/fa';
 
 const menus = {

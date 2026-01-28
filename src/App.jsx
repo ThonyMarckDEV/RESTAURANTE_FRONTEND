@@ -61,6 +61,14 @@ import Home from 'ui/home/Home';
   import AgregarCaja from 'ui/Administrador/cajas/agregarCaja/AgregarCaja';
   import ListarCajas from 'ui/Administrador/cajas/listarCajas/ListarCajas';
   import EditarCaja from 'ui/Administrador/cajas/editarCaja/EditarCaja';
+  //RUTAS MESEROS
+  import AgregarMesero from 'ui/Administrador/meseros/agregarMesero/AgregarMesero';
+  import ListarMeseros from 'ui/Administrador/meseros/listarMeseros/ListarMeseros';
+  import EditarMesero from 'ui/Administrador/meseros/editarMesero/EditarMesero';
+
+
+
+
 
 // Utilities
 import ProtectedRouteHome from 'utilities/ProtectedRoutes/ProtectedRouteHome';
@@ -185,7 +193,15 @@ function AppContent() {
           {/* Ruta Listar Cajas */}
           <Route path="listar-cajas" element={<ListarCajas />} />
           {/* Ruta Editar Caja */}
-          <Route path="editar-caja/:id" element={<EditarCaja />} />
+          <Route path="editar-caja/:id" element={<EditarCaja />} />\
+
+        {/* RUTAS MESEROS */}
+          {/* Ruta Agregar Mesero */}
+          <Route path="agregar-mesero" element={<AgregarMesero />} />
+          {/* Ruta Listar Meseros */}
+          <Route path="listar-meseros" element={<ListarMeseros />} />
+          {/* Ruta Editar Mesero */}
+          <Route path="editar-mesero/:id" element={<EditarMesero />} />
 
 
       </Route>
