@@ -1,94 +1,78 @@
-import axios from 'axios';
 import API_BASE_URL from './urlHelper';
 import jwtUtils from 'utilities/Token/jwtUtils';
+import { logout } from 'js/logout';
 
-/**
- * Valida la sesión actual contra el backend.
- * Envía ambos tokens. El backend decide si son válidos.
- * Si el access_token está expirado, el backend lo renovará
- * y lo devolverá en la respuesta.
- */
-async function verificarYRenovarToken() {
-  // console.log('[Token] Verificando sesión con el backend...');
+export async function fetchWithAuth(url, options = {}) {
+  // -----------------------------------------------------------------------
+  // 1. PREPARACIÓN: Inyección del Access Token
+  // -----------------------------------------------------------------------
   
-  const access_token = jwtUtils.getAccessTokenFromCookie();
-  const refresh_token = jwtUtils.getRefreshTokenFromCookie();
+  let access_token = jwtUtils.getAccessTokenFromCookie();
 
-  // Si faltan tokens localmente, no llama al backend.
-  if (!access_token || !refresh_token) {
-    console.log('[Token] No se encontraron tokens locales. Sesión finalizada.');
-    logout(); // Ejecuta el logout
-    throw new Error('Tokens no encontrados');
-  }
-
-  try {
-    // Única llamada al backend para validar y/o refrescar
-    const response = await axios.post(`${API_BASE_URL}/api/auth/validate-tokens`, {
-      access_token,
-      refresh_token
-    });
-
-    const { valid, access_token: newAccessToken } = response.data;
-
-    // Si el backend dice que no es válido
-    if (!valid) {
-      console.log('[Token] Backend reportó sesión no válida.');
-      logout();
-      throw new Error('Sesión no válida reportada por el backend');
-    }
-
-    // Si el backend nos dio un nuevo access token, lo guardamos
-    if (newAccessToken) {
-      console.log('[Token] Access token renovado por el backend.');
-      jwtUtils.setAccessTokenInCookie(newAccessToken);
-      return newAccessToken; // Devolvemos el nuevo
-    }
-
-    // Si no vino uno nuevo, el original sigue siendo válido
-    // console.log('[Token] Sesión validada. Access token sigue vigente.');
-    return access_token; // Devolvemos el original
-
-  } catch (error) {
-    // Cualquier error (401, 403, 500) significa que la sesión es inválida
-    console.error('[Token] Error al validar tokens con backend:', error.response?.data?.message || error.message);
-    logout();
-    throw new Error('Sesión inválida o expirada');
-  }
-}
-
-/**
- * Función wrapper para hacer fetch asegurando que el token es válido.
- */
-async function fetchWithAuth(url, options = {}) {
-
-  // Esta función se encarga de todo: validar, renovar si es necesario,
-  // o hacer logout y lanzar un error si la sesión es inválida.
-  const access_token = await verificarYRenovarToken();
-  
   const headers = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
     ...options.headers,
-    Authorization: `Bearer ${access_token}`
   };
-  
-  return fetch(url, { ...options, headers });
-}
 
-/**
- * Cierra la sesión del usuario eliminando tokens y redirigiendo.
- */
-function logout() {
-  const refresh_token = jwtUtils.getRefreshTokenFromCookie();
-  
-  // Intenta notificar al backend sobre el logout si hay un refresh token
-  if (refresh_token) {
-    axios.post(`${API_BASE_URL}/api/auth/logout`, { refresh_token })
-      .catch(err => {
-        console.warn('Error al notificar logout al backend:', err.message);
-      });
+  if (access_token) {
+    headers['Authorization'] = `Bearer ${access_token}`;
   }
 
-  jwtUtils.removeTokensFromCookie();
-  window.location.href = '/'; // Redirigir a la página de login
-}
+  // -----------------------------------------------------------------------
+  // 2. EJECUCIÓN INICIAL: Primer intento
+  // -----------------------------------------------------------------------
 
-export { fetchWithAuth, verificarYRenovarToken, logout };
+  let response = await fetch(url, { ...options, headers });
+
+  // -----------------------------------------------------------------------
+  // 3. INTERCEPCIÓN DE ERRORES: Manejo de Token Expirado (401)
+  // -----------------------------------------------------------------------
+  if (response.status === 401) {
+    // console.log("[Auth] 401 detectado. Intentando estrategia de Refresh Token...");
+
+    try {
+      // -------------------------------------------------------
+      // A) Petición de Refresh 
+      // -------------------------------------------------------
+      const refreshResponse = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include' 
+      });
+
+      // Si el refresh falla (ej. el refresh token también expiró o fue revocado)
+      if (!refreshResponse.ok) {
+        throw new Error('No se pudo renovar el token (Refresh token inválido o expirado).');
+      }
+
+      // -------------------------------------------------------
+      // B) Actualización del Estado Local
+      // -------------------------------------------------------
+      const data = await refreshResponse.json();
+      const newAccessToken = data.access_token;
+
+      jwtUtils.setAccessTokenInCookie(newAccessToken);
+
+      // -------------------------------------------------------
+      // C) REINTENTO: Ejecutar la petición original de nuevo
+      // -------------------------------------------------------
+      headers['Authorization'] = `Bearer ${newAccessToken}`;
+      
+      response = await fetch(url, { ...options, headers });
+
+    } catch (error) {
+      // -------------------------------------------------------
+      // D) Fallo Fatal: Logout
+      // -------------------------------------------------------
+      console.error("[Auth] Sesión expirada totalmente. Forzando logout...", error);
+      
+      // Si falló el refresh logout (Usará la versión importada con UI)
+      logout();
+      
+      return response; 
+    }
+  }
+
+  return response;
+}

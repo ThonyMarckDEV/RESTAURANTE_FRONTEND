@@ -8,9 +8,8 @@ const login = async (username, password, rememberMe) => {
     `${API_BASE_URL}/api/auth/login`,
     { username, password, remember_me: rememberMe },
     {
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      withCredentials: true, 
+      headers: { 'Content-Type': 'application/json' },
     }
   );
   return response.data;
