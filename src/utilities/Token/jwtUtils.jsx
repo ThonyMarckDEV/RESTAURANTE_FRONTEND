@@ -65,7 +65,7 @@ export const getEmail = (token) => jwtDecode(token)?.email ?? null;
 
 export const getUserID = (token) => jwtDecode(token)?.sub ?? null;
 
-export const getNombreSede = (token) => jwtDecode(token)?.nombre_sede ?? null;
+export const getNombreSede = (token) => jwtDecode(token)?.nombreSede ?? null;
 
 export const getSedeId = (token) => jwtDecode(token)?.sedeId ?? null;
 

@@ -11,10 +11,22 @@ export const getPlatos = async (pageNumber = 1, filters = {}) => {
     size: 6,
   });
 
+  // Filtro por Nombre
   if (filters.search) params.append('search', filters.search);
-  if (filters.estado !== undefined) params.append('estado', filters.estado);
+
+  // Filtro por Categoría (Faltaba esto)
+  if (filters.categoriaId) params.append('categoriaId', filters.categoriaId);
+
+  // Filtros por Precio (Faltaban estos también)
+  if (filters.minPrecio) params.append('minPrecio', filters.minPrecio);
+  if (filters.maxPrecio) params.append('maxPrecio', filters.maxPrecio);
+
+  // Filtro por Estado
+  if (filters.estado !== undefined && filters.estado !== '') {
+      params.append('estado', filters.estado);
+  }
   
-  // Si enviamos este filtro, el backend excluirá los asignados
+  // Filtro de Exclusión (Para cuando asignas a sedes)
   if (filters.notInSedeId) params.append('notInSedeId', filters.notInSedeId);
 
   const response = await fetchWithAuth(`${BASE_URL}?${params.toString()}`, { 
@@ -22,7 +34,6 @@ export const getPlatos = async (pageNumber = 1, filters = {}) => {
   });
   return handleResponse(response);
 };
-
 // Crear
 export const createPlato = async (data) => {
   const response = await fetchWithAuth(BASE_URL, {
