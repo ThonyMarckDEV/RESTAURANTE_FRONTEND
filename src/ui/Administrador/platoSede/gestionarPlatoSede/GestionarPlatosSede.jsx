@@ -87,7 +87,7 @@ const GestionarPlatosSede = () => {
         } finally {
             setLoading(false);
         }
-    }, [sedeId]); // Dependencia mínima
+    }, [sedeId , filters]); 
 
     // Efecto Debounce para evitar peticiones masivas al escribir
     useEffect(() => {
