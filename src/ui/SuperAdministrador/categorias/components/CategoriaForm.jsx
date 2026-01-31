@@ -1,14 +1,9 @@
 import React from 'react';
 import { TagIcon, SwatchIcon } from '@heroicons/react/24/outline';
-import { isTextOnly } from 'utilities/Validations/validations';
 
 const CategoriaForm = ({ formData, onChange }) => {
   const inputClass = "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-1 focus:ring-restaurant-secondary focus:border-restaurant-secondary outline-none text-sm transition-all";
-  const labelClass = "block text-xs font-bold text-gray-600 mb-1";
-
-  const handleLetterChange = (e) => {
-    if (isTextOnly(e.target.value)) onChange(e);
-  };
+  const labelClass = " text-xs font-bold text-gray-600 mb-1";
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-restaurant-primary h-fit max-w-lg mx-auto">
@@ -26,7 +21,7 @@ const CategoriaForm = ({ formData, onChange }) => {
           <input 
             name="nombre" 
             value={formData.nombre} 
-            onChange={handleLetterChange} 
+            onChange={onChange}
             className={inputClass} 
             placeholder="Ej: Bebidas, Entradas, Carnes"
             required 
