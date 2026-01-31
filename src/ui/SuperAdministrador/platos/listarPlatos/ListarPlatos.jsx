@@ -132,7 +132,7 @@ const ListarPlatos = () => {
             header: 'Acciones',
             render: (row) => (
                 <Link 
-                    to={`/admin/editar-plato/${row.id}`} 
+                    to={`/superadmin/editar-plato/${row.id}`} 
                     className="w-fit flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-restaurant-secondary bg-white border border-restaurant-secondary/30 hover:bg-restaurant-secondary hover:text-white transition-all shadow-sm"
                 >
                     <PencilSquareIcon className="w-4 h-4" /> Editar
@@ -190,7 +190,7 @@ const ListarPlatos = () => {
                     <h1 className="text-3xl font-serif font-bold text-restaurant-primary">Carta / Platos</h1>
                     <p className="text-sm text-gray-500 mt-1">Gestión del menú diario</p>
                 </div>
-                <Link to="/admin/agregar-plato" className="bg-restaurant-primary text-white px-5 py-2.5 rounded-lg font-bold flex items-center gap-2 shadow-md hover:bg-red-900 transition-colors">
+                <Link to="/superadmin/agregar-plato" className="bg-restaurant-primary text-white px-5 py-2.5 rounded-lg font-bold flex items-center gap-2 shadow-md hover:bg-red-900 transition-colors">
                     <FireIcon className="w-5 h-5"/> Nuevo Plato
                 </Link>
             </div>

@@ -39,21 +39,22 @@ import Home from 'ui/home/Home';
   import AgregarInsumo from 'ui/SuperAdministrador/insumos/agregarInsumo/AgregarInsumo';
   import ListarInsumos from 'ui/SuperAdministrador/insumos/listarInsumos/ListarInsumos';
   import EditarInsumo  from 'ui/SuperAdministrador/insumos/editarInsumo/EditarInsumo';
-  import ListarInventarioInsumos from 'ui/Administrador/inventarioInsumo/listarInventarioInsumos/ListarInventarioInsumos'
+  //RUTAS PRODUCTOS
+  import AgregarProductoVenta from 'ui/SuperAdministrador/productos/agregarProductoVenta/AgregarProductoVenta';
+  import ListarProductosVenta from 'ui/SuperAdministrador/productos/listarProductosVenta/ListarProductosVenta';
+  import EditarProductoVenta from 'ui/SuperAdministrador/productos/editarProductoVenta/EditarProductoVenta';
+  //RUTAS PLATOS
+  import AgregarPlato from 'ui/SuperAdministrador/platos/agregarPlato/AgregarPlato';
+  import ListarPlatos from 'ui/SuperAdministrador/platos/listarPlatos/ListarPlatos';
+  import EditarPlato from 'ui/SuperAdministrador/platos/editarPlato/EditarPlato';
+  
+
 
 // UIS ADMIN
   //RUTAS ALMACEN
   import AgregarAlmacen from 'ui/Administrador/almacenes/agregarAlmacen/AgregarAlmacen';
   import ListarAlmacenes from 'ui/Administrador/almacenes/listarAlmacenes/ListarAlmacenes';
   import EditarAlmacen from 'ui/Administrador/almacenes/editarAlmacen/EditarAlmacen';
-  //RUTAS PRODUCTOS
-  import AgregarProductoVenta from 'ui/Administrador/productos/agregarProductoVenta/AgregarProductoVenta';
-  import ListarProductosVenta from 'ui/Administrador/productos/listarProductosVenta/ListarProductosVenta';
-  import EditarProductoVenta from 'ui/Administrador/productos/editarProductoVenta/EditarProductoVenta';
-  //RUTAS PLATOS
-  import AgregarPlato from 'ui/Administrador/platos/agregarPlato/AgregarPlato';
-  import ListarPlatos from 'ui/Administrador/platos/listarPlatos/ListarPlatos';
-  import EditarPlato from 'ui/Administrador/platos/editarPlato/EditarPlato';
   //RUTAS CAJEROS
   import AgregarCajero from 'ui/Administrador/cajeros/agregarCajero/AgregarCajero';
   import ListarCajeros from 'ui/Administrador/cajeros/listarCajeros/ListarCajeros';
@@ -70,7 +71,9 @@ import Home from 'ui/home/Home';
   import AgregarCompraInsumo from 'ui/Administrador/compraInsumo/agregarCompraInsumo/AgregarCompraInsumo';
   import ListarComprasInsumos from 'ui/Administrador/compraInsumo/listarComprasInsumos/ListarComprasInsumos';
   import EditarCompraInsumo from 'ui/Administrador/compraInsumo/editarCompraInsumo/EditarCompraInsumo';
-
+  import ListarInventarioInsumos from 'ui/Administrador/inventarioInsumo/listarInventarioInsumos/ListarInventarioInsumos'
+  //RUTAS PLATO SEDE
+  import GestionarPlatosSede from 'ui/Administrador/platoSede/gestionarPlatoSede/GestionarPlatosSede';
 
 
 
@@ -78,6 +81,7 @@ import Home from 'ui/home/Home';
 // Utilities
 import ProtectedRouteHome from 'utilities/ProtectedRoutes/ProtectedRouteHome';
 import ProtectedRoute from 'utilities/ProtectedRoutes/ProtectedRoute';
+
 
 
 function AppContent() {
@@ -137,6 +141,7 @@ function AppContent() {
           <Route path="listar-insumos" element={<ListarInsumos />} />
           {/* Ruta Editar Insumo */}
           <Route path="editar-insumo/:id" element={<EditarInsumo />} />
+
         {/* RUTAS PRODUCTOS */}
           {/* Ruta Agregar Producto */}
           <Route path="agregar-producto-venta" element={<AgregarProductoVenta />} />
@@ -144,6 +149,14 @@ function AppContent() {
           <Route path="listar-productos-venta" element={<ListarProductosVenta />} />
           {/* Ruta Editar Producto */}
           <Route path="editar-producto-venta/:id" element={<EditarProductoVenta />} />
+
+        {/* RUTAS PLATOS */}
+          {/* Ruta Agregar Plato */}
+          <Route path="agregar-plato" element={<AgregarPlato />} />
+          {/* Ruta Listar Platos */}
+          <Route path="listar-platos" element={<ListarPlatos />} />
+          {/* Ruta Editar Plato */}
+          <Route path="editar-plato/:id" element={<EditarPlato />} />
 
 
 
@@ -176,21 +189,6 @@ function AppContent() {
           {/* Ruta Editar Almacen */}
           <Route path="editar-almacen/:id" element={<EditarAlmacen />} />
 
-        {/* RUTAS PRODUCTOS */}
-          {/* Ruta Agregar Producto */}
-          <Route path="agregar-producto-venta" element={<AgregarProductoVenta />} />
-          {/* Ruta Listar Productos */}
-          <Route path="listar-productos-venta" element={<ListarProductosVenta />} />
-          {/* Ruta Editar Producto */}
-          <Route path="editar-producto-venta/:id" element={<EditarProductoVenta />} />
-
-        {/* RUTAS PLATOS */}
-          {/* Ruta Agregar Plato */}
-          <Route path="agregar-plato" element={<AgregarPlato />} />
-          {/* Ruta Listar Platos */}
-          <Route path="listar-platos" element={<ListarPlatos />} />
-          {/* Ruta Editar Plato */}
-          <Route path="editar-plato/:id" element={<EditarPlato />} />
 
         {/* RUTAS CAJEROS */}
           {/* Ruta Agregar Cajero */}
@@ -218,21 +216,18 @@ function AppContent() {
 
         {/* RUTAS INSUMOS */}
           {/* Ruta Agregar Insumo */}
-          <Route path="agregar-insumo" element={<AgregarInsumo />} />
-          {/* Ruta Listar Insumos */}
-          <Route path="listar-insumos" element={<ListarInsumos />} />
-          {/* Ruta Editar Insumo */}
-          <Route path="editar-insumo/:id" element={<EditarInsumo />} />
-          {/* Ruta Listar Inventario Insumo */}
-          <Route path="listar-inventario-insumos" element={<ListarInventarioInsumos />} />
-
-        {/* RUTAS COMPRAS INSUMOS */}
-          {/* Ruta Agregar Insumo */}
           <Route path="agregar-compra-insumo" element={<AgregarCompraInsumo />} />
           {/* Ruta Listar Insumos */}
           <Route path="listar-compras-insumos" element={<ListarComprasInsumos />} />
           {/* Ruta Editar Insumo */}
           <Route path="editar-compra-insumo/:id" element={<EditarCompraInsumo />} />
+          {/* Ruta Listar Inventario Insumo */}
+          <Route path="listar-inventario-insumos" element={<ListarInventarioInsumos />} />
+
+        {/* RUTAS PLATO SEDE */}
+          {/* Ruta Gestionar Plato Sede */}
+          <Route path="gestionar-plato-sede" element={<GestionarPlatosSede />} />
+
 
 
       </Route>

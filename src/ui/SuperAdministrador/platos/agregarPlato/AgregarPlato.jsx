@@ -50,7 +50,7 @@ const AgregarPlato = () => {
     try {
       await createPlato(formData);
       setAlert({ type: 'success', message: 'Plato registrado correctamente.' });
-      setTimeout(() => navigate('/admin/listar-platos'), 1500);
+      setTimeout(() => navigate('/superadmin/listar-platos'), 1500);
     } catch (err) {
       const details = err.details ? Object.values(err.details).flat() : [];
       setAlert({ type: 'error', message: err.message || 'Error al crear', details });
@@ -63,7 +63,7 @@ const AgregarPlato = () => {
     <div className="container mx-auto p-6 min-h-screen">
       <div className="flex justify-between items-center mb-8 border-b-2 border-restaurant-secondary/20 pb-4">
           <h1 className="text-3xl font-serif font-bold text-restaurant-primary">Nuevo Plato</h1>
-          <button onClick={() => navigate('/admin/listar-platos')} className="text-restaurant-secondary font-bold">← Cancelar</button>
+          <button onClick={() => navigate('/superadmin/listar-platos')} className="text-restaurant-secondary font-bold">← Cancelar</button>
       </div>
       <AlertMessage type={alert?.type} message={alert?.message} details={alert?.details} onClose={() => setAlert(null)} />
       
