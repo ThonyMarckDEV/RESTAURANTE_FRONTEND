@@ -11,16 +11,14 @@ export const getPlatos = async (pageNumber = 1, filters = {}) => {
     size: 6,
   });
 
-  // Filtros dinámicos
   if (filters.search) params.append('search', filters.search);
-  if (filters.categoriaId) params.append('categoriaId', filters.categoriaId);
-  if (filters.minPrecio) params.append('minPrecio', filters.minPrecio);
-  if (filters.maxPrecio) params.append('maxPrecio', filters.maxPrecio);
-  if (filters.estado !== '' && filters.estado !== undefined) params.append('estado', filters.estado);
+  if (filters.estado !== undefined) params.append('estado', filters.estado);
+  
+  // Si enviamos este filtro, el backend excluirá los asignados
+  if (filters.notInSedeId) params.append('notInSedeId', filters.notInSedeId);
 
   const response = await fetchWithAuth(`${BASE_URL}?${params.toString()}`, { 
-    method: 'GET', 
-    headers: { 'Accept': 'application/json' } 
+    method: 'GET' 
   });
   return handleResponse(response);
 };

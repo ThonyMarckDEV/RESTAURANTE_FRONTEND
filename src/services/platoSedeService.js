@@ -19,17 +19,15 @@ export const getPlatosPorSede = async (sedeId, page = 1, filters = {}) => {
   return handleResponse(response);
 };
 
-// Crear: Tu backend recibe StorePlatoSedeDto (platoId y sedeId)
 export const asignarPlatoASede = async (sedeId, platoId) => {
   const response = await fetchWithAuth(BASE_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ sedeId, platoId }) // Estructura de StorePlatoSedeDto
+    body: JSON.stringify({ sedeId, platoId }) 
   });
   return handleResponse(response);
 };
 
-// Eliminar: Coincide con @DeleteMapping("/{id}")
 export const eliminarPlatoDeSede = async (id) => {
   const response = await fetchWithAuth(`${BASE_URL}/${id}`, { method: 'DELETE' });
   return handleResponse(response);

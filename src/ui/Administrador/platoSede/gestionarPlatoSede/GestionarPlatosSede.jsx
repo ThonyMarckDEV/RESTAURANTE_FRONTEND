@@ -7,18 +7,17 @@ import AlertMessage from 'components/Shared/Errors/AlertMessage';
 import ConfirmModal from 'components/Shared/Modals/ConfirmModal';
 import { TrashIcon, PlusIcon, FireIcon, TagIcon } from '@heroicons/react/24/outline';
 import jwtUtils from 'utilities/Token/jwtUtils';
-import { fetchWithAuth } from 'js/authToken'; 
-import API_BASE_URL from 'js/urlHelper';
 
 const GestionarPlatosSede = () => {
     const [loading, setLoading] = useState(true);
     const [platosSede, setPlatosSede] = useState([]);
-    const [todosLosIds, setTodosLosIds] = useState([]);
     const [alert, setAlert] = useState(null);
     const [itemToDelete, setItemToDelete] = useState(null);
     
+    // Estado de Paginación
     const [paginationInfo, setPaginationInfo] = useState({ currentPage: 1, totalPages: 1 });
 
+    // Estado de Filtros
     const [selectedCategoryObj, setSelectedCategoryObj] = useState(null);
     const [filters, setFilters] = useState({
         search: '',
@@ -30,6 +29,7 @@ const GestionarPlatosSede = () => {
     const access_token = jwtUtils.getAccessTokenFromCookie();
     const sedeId = jwtUtils.getSedeId(access_token);
 
+    // --- CONFIGURACIÓN DE FILTROS ---
     const filtersList = useMemo(() => [
         {
             id: 'search',
@@ -44,7 +44,7 @@ const GestionarPlatosSede = () => {
             label: 'Categoría',
             component: (
                 <CategoriaSearchSelect 
-                    categoryTypes={[3]}
+                    categoryTypes={[3]} // 3 = PLATOS
                     initialValue={selectedCategoryObj}
                     onSelect={(cat) => {
                         setSelectedCategoryObj(cat);
@@ -71,6 +71,7 @@ const GestionarPlatosSede = () => {
         }
     ], [filters, selectedCategoryObj]);
 
+    // Función de carga única y eficiente
     const fetchDatosTabla = useCallback(async (page = 1, currentFilters = filters) => {
         if (!sedeId) return;
         setLoading(true);
@@ -86,31 +87,15 @@ const GestionarPlatosSede = () => {
         } finally {
             setLoading(false);
         }
-    }, [sedeId , filters]);
+    }, [sedeId]); // Dependencia mínima
 
-    const fetchTodosLosIds = useCallback(async () => {
-        if (!sedeId) return;
-        try {
-            const params = new URLSearchParams({ page: 0, size: 1000 });
-            const response = await fetchWithAuth(`${API_BASE_URL}/api/plato-sede/sede/${sedeId}?${params.toString()}`);
-            if (response.ok) {
-                const data = await response.json();
-                const content = data.data ? (data.data.content || []) : [];
-                setTodosLosIds(content.map(item => item.platoId));
-            }
-        } catch (error) { console.error("Error cargando IDs", error); }
-    }, [sedeId]);
-
+    // Efecto Debounce para evitar peticiones masivas al escribir
     useEffect(() => {
         const handler = setTimeout(() => {
             fetchDatosTabla(1, filters);
         }, 500);
         return () => clearTimeout(handler);
     }, [filters, fetchDatosTabla]);
-
-    useEffect(() => {
-        fetchTodosLosIds();
-    }, [fetchTodosLosIds]);
 
     const clearFilters = () => {
         setFilters({ search: '', categoriaId: '', minPrecio: '', maxPrecio: '' });
@@ -122,8 +107,7 @@ const GestionarPlatosSede = () => {
         try {
             await asignarPlatoASede(sedeId, plato.id);
             setAlert({ type: 'success', message: 'Plato añadido correctamente.' });
-            fetchDatosTabla(paginationInfo.currentPage, filters);
-            fetchTodosLosIds(); 
+            fetchDatosTabla(paginationInfo.currentPage, filters); 
         } catch (err) {
             setAlert({ type: 'error', message: 'El plato ya existe en esta sede.' });
         }
@@ -137,7 +121,6 @@ const GestionarPlatosSede = () => {
             await eliminarPlatoDeSede(id);
             setAlert({ type: 'success', message: 'Plato retirado de la sede.' });
             fetchDatosTabla(paginationInfo.currentPage, filters);
-            fetchTodosLosIds();
         } catch (err) {
             setAlert({ type: 'error', message: 'Error al intentar retirar el plato.' });
         }
@@ -213,7 +196,7 @@ const GestionarPlatosSede = () => {
                 <div className="max-w-md">
                     <PlatoSearchSelect 
                         onSelect={handleAddPlato}
-                        excludedIds={todosLosIds} 
+                        sedeId={sedeId}
                     />
                 </div>
             </div>
