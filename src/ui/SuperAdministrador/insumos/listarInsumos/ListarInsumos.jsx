@@ -6,6 +6,7 @@ import ConfirmModal from 'components/Shared/Modals/ConfirmModal';
 import Table from 'components/Shared/Tables/Table'; 
 import CategoriaSearchSelect from 'components/Shared/Comboboxes/CategoriaSearchSelect';
 import { PencilSquareIcon, ArchiveBoxIcon, TagIcon, QrCodeIcon } from '@heroicons/react/24/outline';
+import jwtUtils from 'utilities/Token/jwtUtils';
 
 const ListarInsumos = () => {
     const [loading, setLoading] = useState(true);
@@ -13,8 +14,12 @@ const ListarInsumos = () => {
     const [itemToToggle, setItemToToggle] = useState(null);
     const [insumos, setInsumos] = useState([]);
     
-    const [selectedCategoryObj, setSelectedCategoryObj] = useState(null);
+    const access_token = jwtUtils.getAccessTokenFromCookie();
+    const userRole = jwtUtils.getUserRole(access_token) || null; 
+    
+    const isRestricted = userRole === 'admin'; 
 
+    const [selectedCategoryObj, setSelectedCategoryObj] = useState(null);
     const [paginationInfo, setPaginationInfo] = useState({ currentPage: 1, totalPages: 1 });
 
     const [filters, setFilters] = useState({
@@ -41,7 +46,7 @@ const ListarInsumos = () => {
             label: 'Categoría',
             component: (
                 <CategoriaSearchSelect 
-                    categoryTypes={[1]} // 1 = INSUMOS
+                    categoryTypes={[1]} 
                     initialValue={selectedCategoryObj}
                     onSelect={(cat) => {
                         setSelectedCategoryObj(cat);
@@ -93,75 +98,84 @@ const ListarInsumos = () => {
         }
     ], [filters, selectedCategoryObj]);
 
-    // --- COLUMNAS ---
-    const columns = useMemo(() => [
-        {
-            header: 'Insumo',
-            accessor: 'nombre',
-            render: (row) => (
-                <div className="flex flex-col">
-                    <div className="flex items-center gap-2">
-                        <ArchiveBoxIcon className="w-5 h-5 text-restaurant-primary"/>
-                        <span className="font-bold text-gray-800">{row.nombre}</span>
-                    </div>
-                    {row.codigo_interno && (
-                        <div className="flex items-center gap-1 text-xs text-gray-500 ml-7">
-                            <QrCodeIcon className="w-3 h-3"/> {row.codigo_interno}
+    // --- COLUMNAS (DINÁMICAS SEGÚN ROL) ---
+    const columns = useMemo(() => {
+        const baseColumns = [
+            {
+                header: 'Insumo',
+                accessor: 'nombre',
+                render: (row) => (
+                    <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
+                            <ArchiveBoxIcon className="w-5 h-5 text-restaurant-primary"/>
+                            <span className="font-bold text-gray-800">{row.nombre}</span>
                         </div>
-                    )}
-                </div>
-            )
-        },
-        {
-            header: 'Categoría',
-            render: (row) => (
-                <div className="flex items-center gap-2 text-gray-600">
-                    <TagIcon className="w-4 h-4"/>
-                    <span>{row.categoria_nombre}</span>
-                </div>
-            )
-        },
-        {
-            header: 'Stock Min.',
-            render: (row) => (
-                <span className="font-bold text-gray-700">
-                    {row.stock_minimo} {row.unidad_medida}
-                </span>
-            )
-        },
-        {
-            header: 'Costo Prom.',
-            render: (row) => (
-                <span className="font-mono text-gray-700">
-                    S/ {parseFloat(row.precio_compra_promedio).toFixed(2)}
-                </span>
-            )
-        },
-        {
-            header: 'Estado',
-            render: (row) => (
-                <button 
-                    onClick={() => setItemToToggle(row)}
-                    className={`px-3 py-1 font-bold text-xs rounded-full border transition-all ${
-                        row.estado === 1 ? 'text-emerald-700 bg-emerald-100 border-emerald-200' : 'text-red-700 bg-red-50 border-red-100'
-                    }`}
-                >
-                    {row.estado === 1 ? 'ACTIVO' : 'INACTIVO'}
-                </button>
-            )
-        },
-        {
-            header: 'Acciones',
-            render: (row) => (
-                <Link 
-                    to={`/superadmin/editar-insumo/${row.id}`} 
-                    className="w-fit flex items-center gap-1 px-3 py-1 text-sm font-medium text-restaurant-secondary border border-restaurant-secondary/30 rounded hover:bg-restaurant-secondary hover:text-white transition-colors"
-                >
-                    <PencilSquareIcon className="w-4 h-4" /> Editar
-                </Link>
-            )
+                        {row.codigo_interno && (
+                            <div className="flex items-center gap-1 text-xs text-gray-500 ml-7">
+                                <QrCodeIcon className="w-3 h-3"/> {row.codigo_interno}
+                            </div>
+                        )}
+                    </div>
+                )
+            },
+            {
+                header: 'Categoría',
+                render: (row) => (
+                    <div className="flex items-center gap-2 text-gray-600">
+                        <TagIcon className="w-4 h-4"/>
+                        <span>{row.categoria_nombre}</span>
+                    </div>
+                )
+            },
+            {
+                header: 'Stock Min.',
+                render: (row) => (
+                    <span className="font-bold text-gray-700">
+                        {row.stock_minimo} {row.unidad_medida}
+                    </span>
+                )
+            },
+            {
+                header: 'Costo Prom.',
+                render: (row) => (
+                    <span className="font-mono text-gray-700">
+                        S/ {parseFloat(row.precio_compra_promedio).toFixed(2)}
+                    </span>
+                )
+            },
+            {
+                header: 'Estado',
+                render: (row) => (
+                    <button 
+                        onClick={isRestricted ? undefined : () => setItemToToggle(row)}
+                        disabled={isRestricted}
+                        className={`px-3 py-1 font-bold text-xs rounded-full border transition-all ${
+                            row.estado === 1 ? 'text-emerald-700 bg-emerald-100 border-emerald-200' : 'text-red-700 bg-red-50 border-red-100'
+                        } ${isRestricted ? 'cursor-default opacity-80' : 'hover:scale-105'}`}
+                    >
+                        {row.estado === 1 ? 'ACTIVO' : 'INACTIVO'}
+                    </button>
+                )
+            }
+        ];
+
+        // SOLO AGREGAMOS LA COLUMNA ACCIONES SI NO ES ADMIN (RESTRINGIDO)
+        if (!isRestricted) {
+            baseColumns.push({
+                header: 'Acciones',
+                render: (row) => (
+                    <Link 
+                        to={`/superadmin/editar-insumo/${row.id}`} 
+                        className="w-fit flex items-center gap-1 px-3 py-1 text-sm font-medium text-restaurant-secondary border border-restaurant-secondary/30 rounded hover:bg-restaurant-secondary hover:text-white transition-colors"
+                    >
+                        <PencilSquareIcon className="w-4 h-4" /> Editar
+                    </Link>
+                )
+            });
         }
-    ], []);
+
+        return baseColumns;
+    }, [isRestricted]); // Dependencia importante: isRestricted
 
     // --- FETCH DATA ---
     const fetchInsumos = useCallback(async (page, currentFilters) => {
@@ -185,14 +199,7 @@ const ListarInsumos = () => {
     }, [filters, fetchInsumos]);
 
     const clearFilters = () => {
-        setFilters({
-            search: '',
-            unidad: '',
-            estado: '',
-            categoriaId: '',
-            minPrecio: '',
-            maxPrecio: ''
-        });
+        setFilters({ search: '', unidad: '', estado: '', categoriaId: '', minPrecio: '', maxPrecio: '' });
         setSelectedCategoryObj(null);
     };
 
@@ -213,9 +220,13 @@ const ListarInsumos = () => {
                     <h1 className="text-3xl font-serif font-bold text-restaurant-primary">Insumos</h1>
                     <p className="text-sm text-gray-500 mt-1">Gestión de materia prima</p>
                 </div>
-                <Link to="/superadmin/agregar-insumo" className="bg-restaurant-primary text-white px-5 py-2.5 rounded-lg font-bold flex items-center gap-2 shadow-md hover:bg-red-900 transition-colors">
-                    <ArchiveBoxIcon className="w-5 h-5"/> Nuevo Insumo
-                </Link>
+                
+                {/* SOLO MOSTRAMOS EL BOTÓN SI NO ES RESTRINGIDO */}
+                {!isRestricted && (
+                    <Link to="/superadmin/agregar-insumo" className="bg-restaurant-primary text-white px-5 py-2.5 rounded-lg font-bold flex items-center gap-2 shadow-md hover:bg-red-900 transition-colors">
+                        <ArchiveBoxIcon className="w-5 h-5"/> Nuevo Insumo
+                    </Link>
+                )}
             </div>
             
             <AlertMessage type={alert?.type} message={alert?.message} onClose={() => setAlert(null)} />

@@ -7,6 +7,7 @@ import ConfirmModal from 'components/Shared/Modals/ConfirmModal';
 import Table from 'components/Shared/Tables/Table';
 import { PencilSquareIcon, TagIcon } from '@heroicons/react/24/outline';
 import { PillBottle, PillBottleIcon } from 'lucide-react';
+import jwtUtils from 'utilities/Token/jwtUtils'; 
 
 const ListarProductosVenta = () => {
     const [loading, setLoading] = useState(true);
@@ -14,8 +15,12 @@ const ListarProductosVenta = () => {
     const [itemToToggle, setItemToToggle] = useState(null);
     const [productos, setProductos] = useState([]);
     
-    const [selectedCategoryObj, setSelectedCategoryObj] = useState(null);
+    // 2. Obtener Rol y definir restricción
+    const access_token = jwtUtils.getAccessTokenFromCookie();
+    const userRole = jwtUtils.getUserRole(access_token) || null;
+    const isRestricted = userRole === 'admin'; 
 
+    const [selectedCategoryObj, setSelectedCategoryObj] = useState(null);
     const [paginationInfo, setPaginationInfo] = useState({ currentPage: 1, totalPages: 1 });
 
     const [filters, setFilters] = useState({
@@ -24,7 +29,6 @@ const ListarProductosVenta = () => {
         estado: ''
     });
 
-    // --- FILTROS ---
     const filtersList = useMemo(() => [
         {
             id: 'search',
@@ -61,67 +65,76 @@ const ListarProductosVenta = () => {
         }
     ], [filters, selectedCategoryObj]);
 
-    // --- COLUMNAS ---
-    const columns = useMemo(() => [
-        {
-            header: 'Producto',
-            render: (row) => (
-                <div className="flex flex-col">
-                    <div className="flex items-center gap-2">
-                        <PillBottleIcon className="w-5 h-5 text-restaurant-primary"/>
-                        <span className="font-bold text-gray-800">{row.nombre}</span>
+    // 3. Columnas Dinámicas
+    const columns = useMemo(() => {
+        const baseColumns = [
+            {
+                header: 'Producto',
+                render: (row) => (
+                    <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
+                            <PillBottleIcon className="w-5 h-5 text-restaurant-primary"/>
+                            <span className="font-bold text-gray-800">{row.nombre}</span>
+                        </div>
+                        {row.marca && (
+                            <span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full w-fit mt-1 ml-7">{row.marca}</span>
+                        )}
                     </div>
-                    {row.marca && (
-                        <span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full w-fit mt-1 ml-7">{row.marca}</span>
-                    )}
-                </div>
-            )
-        },
-        {
-            header: 'Categoría',
-            render: (row) => (
-                <div className="flex items-center gap-2 text-gray-600">
-                    <TagIcon className="w-4 h-4"/>
-                    <span>{row.categoria_nombre}</span>
-                </div>
-            )
-        },
-        {
-            header: 'P. Venta',
-            render: (row) => (
-                <span className="text-emerald-700 font-bold font-mono text-base">
-                    S/ {parseFloat(row.precio_venta).toFixed(2)}
-                </span>
-            )
-        },
-        {
-            header: 'Estado',
-            render: (row) => (
-                <button 
-                    onClick={() => setItemToToggle(row)}
-                    className={`px-3 py-1 font-bold text-xs rounded-full border transition-all hover:scale-105 ${
-                        row.estado === 1 ? 'text-emerald-700 bg-emerald-100 border-emerald-200' : 'text-red-700 bg-red-50 border-red-100'
-                    }`}
-                >
-                    {row.estado === 1 ? 'ACTIVO' : 'INACTIVO'}
-                </button>
-            )
-        },
-        {
-            header: 'Acciones',
-            render: (row) => (
-                <Link 
-                    to={`/admin/editar-producto-venta/${row.id}`} 
-                    className="w-fit flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-restaurant-secondary bg-white border border-restaurant-secondary/30 hover:bg-restaurant-secondary hover:text-white transition-all duration-200 shadow-sm"
-                >
-                    <PencilSquareIcon className="w-4 h-4" /> 
-                    <span>Editar</span>
-                </Link>
-            )
-        }
-    ], []);
+                )
+            },
+            {
+                header: 'Categoría',
+                render: (row) => (
+                    <div className="flex items-center gap-2 text-gray-600">
+                        <TagIcon className="w-4 h-4"/>
+                        <span>{row.categoria_nombre}</span>
+                    </div>
+                )
+            },
+            {
+                header: 'P. Venta',
+                render: (row) => (
+                    <span className="text-emerald-700 font-bold font-mono text-base">
+                        S/ {parseFloat(row.precio_venta).toFixed(2)}
+                    </span>
+                )
+            },
+            {
+                header: 'Estado',
+                render: (row) => (
+                    <button 
+                        // Bloquear click si es restringido
+                        onClick={isRestricted ? undefined : () => setItemToToggle(row)}
+                        disabled={isRestricted}
+                        className={`px-3 py-1 font-bold text-xs rounded-full border transition-all ${
+                            row.estado === 1 ? 'text-emerald-700 bg-emerald-100 border-emerald-200' : 'text-red-700 bg-red-50 border-red-100'
+                        } ${isRestricted ? 'cursor-default opacity-80' : 'hover:scale-105'}`}
+                    >
+                        {row.estado === 1 ? 'ACTIVO' : 'INACTIVO'}
+                    </button>
+                )
+            }
+        ];
 
-    // --- FETCH DATA ---
+        // 4. Solo agregar Acciones si NO es restringido
+        if (!isRestricted) {
+            baseColumns.push({
+                header: 'Acciones',
+                render: (row) => (
+                    <Link 
+                        to={`/admin/editar-producto-venta/${row.id}`} 
+                        className="w-fit flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-restaurant-secondary bg-white border border-restaurant-secondary/30 hover:bg-restaurant-secondary hover:text-white transition-all duration-200 shadow-sm"
+                    >
+                        <PencilSquareIcon className="w-4 h-4" /> 
+                        <span>Editar</span>
+                    </Link>
+                )
+            });
+        }
+
+        return baseColumns;
+    }, [isRestricted]); // Dependencia clave
+
     const fetchProductos = useCallback(async (page, currentFilters) => {
         setLoading(true);
         try {
@@ -172,9 +185,13 @@ const ListarProductosVenta = () => {
                     <h1 className="text-3xl font-serif font-bold text-restaurant-primary">Productos Venta</h1>
                     <p className="text-sm text-gray-500 mt-1">Gaseosas, Cervezas, etc.</p>
                 </div>
-                <Link to="/admin/agregar-producto-venta" className="bg-restaurant-primary text-white px-5 py-2.5 rounded-lg font-bold flex items-center gap-2 shadow-md hover:bg-red-900 transition-colors">
-                    <PillBottle className="w-5 h-5"/> Nuevo Producto
-                </Link>
+                
+                {/* 5. Ocultar botón si es restringido */}
+                {!isRestricted && (
+                    <Link to="/admin/agregar-producto-venta" className="bg-restaurant-primary text-white px-5 py-2.5 rounded-lg font-bold flex items-center gap-2 shadow-md hover:bg-red-900 transition-colors">
+                        <PillBottle className="w-5 h-5"/> Nuevo Producto
+                    </Link>
+                )}
             </div>
             
             <AlertMessage type={alert?.type} message={alert?.message} onClose={() => setAlert(null)} />
